@@ -1,15 +1,14 @@
-# Fab - Voice Analysis Package
+# fab - Voice Analysis Package
 
-Welcome to Fab - a voice analysis package that aims to help you analyze and visualize audio recordings of human speech. This package is currently in progress, so please expect some bugs and inconsistencies.
+Welcome to fab - a voice analysis package that aims to help you analyze and visualize audio recordings of human speech. This package is currently in progress, so please expect some bugs and inconsistencies.
 
 ## Installation
 
-To install Fab, simply run the following command in your terminal:
+To install fab, simply run the following command in your terminal:
 
-'''
+```
 source myscript.sh
-'''
-
+```
 
 This command will create a Conda environment called `fab`, clone all the required repositories, install all dependencies, and activate the `fab` environment. Once the command has finished running, you should see a message indicating that the `fab` environment is now active and ready to use.
 
