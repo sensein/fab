@@ -2,6 +2,10 @@
 tools/pyannote-audio
 tools/s3prl
 tools/serab-byols
+tools/pycochleagram
+
+# tmp folders
+children-voice-detection/tmp 
 
 # Apple
 .DS_Store

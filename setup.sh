@@ -94,6 +94,27 @@ pip install -e ".[all]"
 cd ..
 #################### s3prl #########################
 
+#################### pycochleagram #########################
+repo_url="https://github.com/mcdermottLab/pycochleagram.git"
+repo_dir="pycochleagram"
+
+if [ -d "$repo_dir" ]; then
+  # Repository exists, pull updates
+  echo "Repository '$repo_dir' exists, pulling updates..."
+  cd "$repo_dir"
+  git pull
+  cd .. 
+else
+  # Repository does not exist, clone it
+  echo "Repository '$repo_dir' does not exist, cloning..."
+  git clone "$repo_url" "$repo_dir"
+fi
+
+cd "$repo_dir"
+python setup.py install
+cd ..
+#################### pycochleagram #########################
+
 #################### fab #########################
 pip install -r requirements.txt
 cd ../..
