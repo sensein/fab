@@ -2,7 +2,9 @@
 #SBATCH --job-name=cvd
 
 log_path="../logs"
-mkdir -p $log_path
+if [[ ! -e $dir ]]; then
+    mkdir -p $log_path
+fi
 
 #SBATCH --output=../logs/%j.out
 #SBATCH --error=../logs/%j.err
