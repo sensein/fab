@@ -1,11 +1,5 @@
 #!/bin/bash                      
 #SBATCH --job-name=cvd
-
-log_path="../logs"
-if [[ ! -e $dir ]]; then
-    mkdir -p $log_path
-fi
-
 #SBATCH --output=../logs/%j.out
 #SBATCH --error=../logs/%j.err
 #SBATCH -t 1:00:00          # walltime = 1 hours and 30 minutes

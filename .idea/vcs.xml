@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tools/pyannote-audio" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tools/pycochleagram" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tools/s3prl" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tools/serab-byols" vcs="Git" />
+  </component>
+</project>
