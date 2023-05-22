@@ -3,6 +3,7 @@ tools/pyannote-audio
 tools/s3prl
 tools/serab-byols
 tools/pycochleagram
+tools/speechbrain
 
 # tmp folders
 children-voice-detection/tmp 

@@ -52,6 +52,28 @@ pre-commit install
 cd ..
 #################### pyannote-audio #########################
 
+#################### speechbrain #########################
+repo_url="https://github.com/fabiocat93/speechbrain.git"
+repo_dir="speechbrain"
+
+if [ -d "$repo_dir" ]; then
+  # Repository exists, pull updates
+  echo "Repository '$repo_dir' exists, pulling updates..."
+  cd "$repo_dir"
+  git pull
+  cd .. 
+else
+  # Repository does not exist, clone it
+  echo "Repository '$repo_dir' does not exist, cloning..."
+  git clone "$repo_url" "$repo_dir"
+fi
+
+cd "$repo_dir"
+pip install -r requirements.txt
+pip install --editable .
+cd ..
+#################### speechbrain #########################
+
 #################### serab-byols #########################
 repo_url="https://github.com/GasserElbanna/serab-byols.git"
 repo_dir="serab-byols"
@@ -74,7 +96,7 @@ cd ..
 #################### serab-byols #########################
 
 #################### s3prl #########################
-repo_url="https://github.com/s3prl/s3prl.git"
+repo_url="https://github.com/fabiocat93/s3prl.git"
 repo_dir="s3prl"
 
 if [ -d "$repo_dir" ]; then
@@ -95,7 +117,7 @@ cd ..
 #################### s3prl #########################
 
 #################### pycochleagram #########################
-repo_url="https://github.com/mcdermottLab/pycochleagram.git"
+repo_url="https://github.com/fabiocat93/pycochleagram.git"
 repo_dir="pycochleagram"
 
 if [ -d "$repo_dir" ]; then

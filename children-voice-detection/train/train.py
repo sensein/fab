@@ -1,3 +1,11 @@
+# TODO:
+'''
+- CAPIRE COSA FARE E COME!!
+
+'''
+
+
+
 print("this is train.py")
 
 ############################  IMPORT ############################
@@ -44,13 +52,36 @@ print(f'Decoder: {decoder}')
 path_to_database_file = '/om2/user/fabiocat/csad/data/pyannote/mini_new/database.yml'
 my_protocol_name = "MyChildrenDataset.SpeakerDiarization.real"
 
+# GENERAL
+optimizer_name = "Adam"
+max_epochs = 2  # >>>> 10 # TODO: TO CHANGE!!
 window_duration = 5.0  # from hpt
-lstm_num_layers = 2
-optimizer_name = "RMSprop"
 lr = 0.0006  # 0.00044610980058861524
+
+# ECAPA
+# none
+
+# HuBERT
+# none
+
+# Wav2Vec2.0
+# none
+
+# Wav2vec2.0 child
+# none
+
+#SINCNET
 my_stride = 1
 my_stride = 10 ** my_stride
-max_epochs = 2  # >>>> 10 # TODO: TO CHANGE!!
+
+#LSTM
+lstm_num_layers = 2
+
+#TRANSFORMER
+#...
+
+#GPT2
+#...
 
 ############################  INITIALIZATIONS ############################
 

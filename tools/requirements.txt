@@ -1,1 +1,3 @@
 notebook
+seaborn
+ipywidgets
