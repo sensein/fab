@@ -2,9 +2,10 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tools/FreeVC" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tools/TTS" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/tools/pyannote-audio" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/tools/pycochleagram" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/tools/s3prl" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/tools/serab-byols" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tools/speechbrain" vcs="Git" />
   </component>
 </project>
