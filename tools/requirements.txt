@@ -2,3 +2,4 @@ notebook
 seaborn
 ipywidgets
 scikit-learn
+datasets
