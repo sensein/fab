@@ -1,6 +1,6 @@
 import os
 import inspect
-from transformers import AutoProcessor, AutoModelForAudioClassification, AutoFeatureExtractor
+from transformers import AutoModelForAudioClassification, AutoFeatureExtractor
 import torch
 
 
@@ -10,9 +10,12 @@ class AudioEncoder:
         Initialize the AudioEncoder class.
 
         Args:
-            model_checkpoint (str): The checkpoint name or path of the pretrained encoder model.
-            models_save_dir (str): The directory where the pretrained models are saved.
+            model_name (str): Name of the audio encoder model.
+            model_checkpoint (str): Path or identifier of the pretrained model checkpoint. Default is None.
+            models_save_dir (str): Directory to save the pretrained models. Default is None.
+            extra_params (dict): Additional parameters for the audio encoder. Default is None.
         """
+
         # Check if temporal audio representation extraction method is available
         self.time_dependent_representation_available = self.check_temporal_audio_extraction()
         # Check if time independent audio representation extraction method is available
@@ -29,11 +32,19 @@ class AudioEncoder:
         # Load the pretrained encoder model
         self.encoder = AutoModelForAudioClassification.from_pretrained(model_checkpoint,
                                                                        cache_dir=models_save_dir_absolute_path)
+        self.feature_extractor = AutoFeatureExtractor.from_pretrained(model_checkpoint,
+                                                                      cache_dir=models_save_dir_absolute_path)
 
         if bool(extra_params) and 'layer_number' in extra_params:
             self.layer_number = extra_params['layer_number']
         else:
-            self.layer_number: None
+            # the last layer is the default one
+            self.layer_number = -1
+        if bool(extra_params) and 'sampling_rate' in extra_params:
+            self.sampling_rate = extra_params['sampling_rate']
+        else:
+            self.sampling_rate = 16000
+
         self.model_name = model_name
 
     def check_temporal_audio_extraction(self):
@@ -60,25 +71,39 @@ class AudioEncoder:
 
     def temporal_audio_representation_extraction(self, input_waveforms):
         """
-        Extract temporal audio representations from input waveforms.
+        Extracts temporal audio representations from input waveforms.
 
         Args:
-            input_waveforms (Tensor): Input waveforms for which representations need to be extracted.
+            input_waveforms (list): List of input audio waveforms.
 
         Returns:
-            Tensor: Temporal audio representations (embeddings) of the input waveforms.
-        Raises:
-            NotImplementedError: If temporal audio representation extraction is not available.
+            raw_encoder_response (list): List of raw encoder responses for each input waveform.
+            output_embeddings (torch.Tensor): Tensor containing output embeddings for each input waveform.
         """
+
         # Check if temporal audio representation extraction is available
         if not self.time_dependent_representation_available:
             raise NotImplementedError("Temporal audio representation extraction is not available.")
-        # Encode the input waveforms to obtain embeddings
         if not hasattr(self, 'layer_number'):
             raise NotImplementedError("layer_number not specified.")
-        embeddings = self.encoder(input_waveforms, output_hidden_states=True)
-        if self.layer_number < 0 or self.layer_number > len(embeddings.hidden_states) - 1:
-            raise NotImplementedError(
-                f"layer_number can only be a value between 0 and {len(embeddings.hidden_states) - 1}")
-        embeddings = embeddings.hidden_states[self.layer_number].permute(0, 2, 1)
-        return embeddings
+
+        raw_encoder_response = []
+        output_embeddings = []
+
+        for input_waveform in input_waveforms:
+            # Encode the input waveforms to obtain embeddings
+            inputs = self.feature_extractor(input_waveform, sampling_rate=self.sampling_rate, return_tensors="pt")
+            input_features = inputs.input_features
+            embeddings = self.encoder(input_features, output_hidden_states=True)
+            raw_encoder_response.append(embeddings)
+
+            if self.layer_number > len(embeddings.hidden_states) - 1:
+                raise NotImplementedError(
+                    f"layer_number can only be a value between 0 and {len(embeddings.hidden_states) - 1}")
+
+            embeddings = embeddings.hidden_states[self.layer_number].squeeze(0).permute(1, 0)
+            output_embeddings.append(embeddings)
+
+        output_embeddings = torch.stack(output_embeddings)
+
+        return raw_encoder_response, output_embeddings

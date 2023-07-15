@@ -2,11 +2,15 @@ import inspect
 import pycochleagram.cochleagram as cgram
 import torch
 
-
 class AudioEncoder:
     def __init__(self, model_name='human_cochleagram', extra_params=None):
         """
-        Initialize the AudioEncoder class.
+        Initialize the AudioEncoder.
+
+        Args:
+            model_name (str): Name of the encoder model to use. Default is 'human_cochleagram'.
+            extra_params (dict): Extra parameters for the encoder. Optional.
+
         """
         # Check if temporal audio representation extraction method is available
         self.time_dependent_representation_available = self.check_temporal_audio_extraction()
@@ -53,21 +57,31 @@ class AudioEncoder:
 
     def temporal_audio_representation_extraction(self, input_waveforms):
         """
-        Extract temporal audio representations from input waveforms.
+        Extracts temporal audio representations from input waveforms.
 
         Args:
-            input_waveforms (Tensor): Input waveforms for which representations need to be extracted.
+            input_waveforms (numpy.ndarray): Input audio waveforms.
 
         Returns:
-            Tensor: Temporal audio representations (embeddings) of the input waveforms.
+            cochleagram (numpy.ndarray): Temporal audio representation in the form of a cochleagram.
+            embeddings (torch.Tensor): Temporal audio representations as embeddings.
+
         Raises:
             NotImplementedError: If temporal audio representation extraction is not available.
         """
+
         # Check if temporal audio representation extraction is available
         if not self.time_dependent_representation_available:
             raise NotImplementedError("Temporal audio representation extraction is not available.")
+
+        # Extract cochleagram using the encoder
         cochleagram = self.encoder(input_waveforms, sr=self.sample_rate, strict=self.strict, n=self.n)
+
+        # Convert cochleagram to log scale and detach from computation graph
         embeddings = (torch.from_numpy(cochleagram) + torch.finfo().eps).log().cpu().detach()
+
+        # If embeddings have a dimension of 2, add an additional dimension
         if embeddings.dim() == 2:
             embeddings = embeddings.unsqueeze(0)
-        return embeddings
+
+        return cochleagram, embeddings

@@ -1,9 +1,8 @@
 #!/bin/bash
 
 #################### config #########################
-env_name="fab"
-tools_folder="tools" 
-conda_sh="/Users/fabiocat/miniconda3/etc/profile.d/conda.sh"
+# Source the config file
+source config.sh
 #################### config #########################
 
 ######################################## start #############################################

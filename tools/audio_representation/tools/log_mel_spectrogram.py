@@ -2,14 +2,30 @@ import inspect
 import torch
 import torchaudio.transforms as T
 
+
 class AudioEncoder:
     def __init__(self, model_name='log_mel_spectrogram', extra_params=None):
         """
-        Initialize the AudioEncoder class.
+        Initialize an AudioEncoder object.
+
+        Args:
+            model_name (str): The name of the audio encoding model. Default is 'log_mel_spectrogram'.
+            extra_params (dict): Additional parameters for configuring the encoder. Default is None.
+
+        Attributes:
+            time_dependent_representation_available (bool): Flag indicating if temporal audio representation extraction method is available.
+            time_independent_representation_available (bool): Flag indicating if time independent audio representation extraction method is available.
+            sample_rate (int): The sample rate of the audio. Default is 16000.
+            n_fft (int): The number of FFT points. Default is 4096.
+            win_length (int or None): The window length in samples. Default is None.
+            hop_length (int): The hop length in samples. Default is 512.
+            n_mels (int): The number of Mel filterbanks. Default is 128.
+            f_min (int): The minimum frequency in Hz. Default is 5.
+            f_max (int): The maximum frequency in Hz. Default is 20000.
+            power (int): The power of the spectrogram. Default is 2.
+            encoder (torchaudio.transforms.MelSpectrogram): The pretrained encoder model.
         """
-        # Check if temporal audio representation extraction method is available
         self.time_dependent_representation_available = self.check_temporal_audio_extraction()
-        # Check if time independent audio representation extraction method is available
         self.time_independent_representation_available = self.check_time_independent_audio_extraction()
 
         if bool(extra_params) and 'sample_rate' in extra_params:
@@ -52,7 +68,6 @@ class AudioEncoder:
         else:
             self.power = 2
 
-        # Load the pretrained encoder model
         self.encoder = T.MelSpectrogram(
             sample_rate=self.sample_rate,
             n_fft=self.n_fft,
@@ -71,7 +86,6 @@ class AudioEncoder:
         Returns:
             bool: True if the method is available, False otherwise.
         """
-        # Check if the method 'temporal_audio_representation_extraction' exists and is a method
         return 'temporal_audio_representation_extraction' in dir(self) and \
             inspect.ismethod(getattr(self, 'temporal_audio_representation_extraction'))
 
@@ -82,25 +96,31 @@ class AudioEncoder:
         Returns:
             bool: True if the method is available, False otherwise.
         """
-        # Check if the method 'time_independent_audio_representation_extraction' exists and is a method
         return 'time_independent_audio_representation_extraction' in dir(self) and \
             inspect.ismethod(getattr(self, 'time_independent_audio_representation_extraction'))
 
     def temporal_audio_representation_extraction(self, input_waveforms):
         """
-        Extract temporal audio representations from input waveforms.
+        Extracts temporal audio representations from input waveforms.
 
         Args:
-            input_waveforms (Tensor): Input waveforms for which representations need to be extracted.
+            input_waveforms (torch.Tensor): Input waveforms of shape (batch_size, num_samples).
 
         Returns:
-            Tensor: Temporal audio representations (embeddings) of the input waveforms.
-        Raises:
-            NotImplementedError: If temporal audio representation extraction is not available.
+            tuple: A tuple containing:
+                - mel_spectrogram (torch.Tensor): Mel spectrogram of shape (batch_size, num_mel_bins, num_frames).
+                - embeddings (torch.Tensor): Embeddings derived from the mel spectrogram of shape (batch_size, num_mel_bins, num_frames).
         """
-        # Check if temporal audio representation extraction is available
+
         if not self.time_dependent_representation_available:
             raise NotImplementedError("Temporal audio representation extraction is not available.")
+
+        # Extract mel spectrogram
         mel_spectrogram = self.encoder(input_waveforms)
+
+        # Add epsilon and take the logarithm of the mel spectrogram
         embeddings = (mel_spectrogram + torch.finfo().eps).log().detach()
-        return embeddings
+
+        # Return the mel spectrogram and embeddings
+        return mel_spectrogram, embeddings
+

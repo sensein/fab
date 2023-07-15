@@ -6,11 +6,13 @@ import s3prl.hub as s3hub
 class AudioEncoder:
     def __init__(self, model_name, model_checkpoint=None, models_save_dir=None, extra_params=None):
         """
-        Initialize the AudioEncoder class.
+        Initialize the AudioEncoder object.
 
         Args:
-            model_checkpoint (str): The checkpoint name or path of the pretrained encoder model.
-            models_save_dir (str): The directory where the pretrained models are saved.
+            model_name (str): Name of the audio encoding model.
+            model_checkpoint (str): Checkpoint name for the model. Default is None.
+            models_save_dir (str): Directory where the pretrained models are saved. Default is None.
+            extra_params (dict): Extra parameters for the audio encoder. Default is None.
         """
         # Check if temporal audio representation extraction method is available
         self.time_dependent_representation_available = self.check_temporal_audio_extraction()
@@ -28,6 +30,19 @@ class AudioEncoder:
         self.model_name = model_name
         self.extra_params = extra_params
 
+        # Set the default model checkpoint based on the model name
+        if model_checkpoint is None and self.model_name == 'apc':
+            model_checkpoint = 'apc'
+        elif model_checkpoint is None and self.model_name == 'tera':
+            model_checkpoint = 'tera'
+
+        if bool(extra_params) and 'layer_number' in extra_params:
+            self.layer_number = extra_params['layer_number']
+        else:
+            # the last layer is the default one
+            self.layer_number = -1
+
+        # Instantiate the audio encoder model
         self.encoder = getattr(s3hub, model_checkpoint)()
         self.encoder.eval()
 
@@ -53,21 +68,34 @@ class AudioEncoder:
         return 'time_independent_audio_representation_extraction' in dir(self) and \
             inspect.ismethod(getattr(self, 'time_independent_audio_representation_extraction'))
 
-    def time_independent_audio_representation_extraction(self, input_waveforms):
+    def temporal_audio_representation_extraction(self, input_waveforms):
         """
-        Extract time independent audio representations from input waveforms.
+        Extracts temporal audio representation from input waveforms.
 
         Args:
-            input_waveforms (Tensor): Input waveforms for which representations need to be extracted.
+            input_waveforms (Tensor): Input waveforms for audio processing.
 
         Returns:
-            Tensor: Time independent audio representations (embeddings) of the input waveforms.
+            tuple: A tuple containing raw_encoder_response and embeddings.
+                - raw_encoder_response (dict): Raw response from the encoder.
+                - embeddings (Tensor): Extracted embeddings from the encoder.
+
         Raises:
-            NotImplementedError: If time independent audio representation extraction is not available.
+            NotImplementedError: If temporal audio representation extraction is not available.
+            NotImplementedError: If layer_number is invalid.
         """
-        # Check if time independent audio representation extraction is available
-        if not self.time_independent_representation_available:
-            raise NotImplementedError("Time independent audio representation extraction is not available.")
+
+        if not self.time_dependent_representation_available:
+            raise NotImplementedError("Temporal audio representation extraction is not available.")
+
+        raw_encoder_response = self.encoder(input_waveforms)
         # Encode the input waveforms to obtain embeddings
-        embeddings = self.encoder(input_waveforms)["last_hidden_state"].permute(0, 2, 1)
-        return embeddings
+
+        if self.layer_number > len(raw_encoder_response["hidden_states"]) - 1:
+            raise NotImplementedError(
+                f"layer_number can only be a value between 0 and {len(raw_encoder_response['hidden_states']) - 1}")
+
+        embeddings = raw_encoder_response["hidden_states"][self.layer_number].permute(0, 2, 1)
+
+        return raw_encoder_response, embeddings
+

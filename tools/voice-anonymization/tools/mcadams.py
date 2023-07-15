@@ -202,13 +202,22 @@ def anonym(freq, samples, winLengthinms=20, shiftLengthinms=10, lp_order=20, mca
 
 
 def anonymize(source_files, output_files):
+    # Loop through pairs of source and output files
     for line in tqdm(zip(source_files, output_files)):
         source_file, output_file = line
 
+        # Read source audio file and convert to float
         sr, input_wav = waveReadAsFloat(source_file)
+
+        # Generate a random coefficient in the range [0.5, 0.9]
         random_coef = random.uniform(0.5, 0.9)
+
+        # Anonymize the audio using the given parameters
         anonymized_wav = anonym(sr, input_wav, winLengthinms=20, shiftLengthinms=10, lp_order=20, mcadams=random_coef)
 
+        # Create the output directory if it doesn't exist
         pathlib.Path(os.path.dirname(output_file)).mkdir(parents=True, exist_ok=True)
+
+        # Save the anonymized audio to the output file
         torchaudio.save(output_file, torch.tensor(anonymized_wav).unsqueeze(0), sr, encoding="PCM_S",
                         bits_per_sample=16, format="wav")

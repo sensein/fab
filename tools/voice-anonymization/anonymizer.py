@@ -57,7 +57,6 @@ class VoiceAnonymizer:
             raise ValueError("source_files and output_files must have the same length.")
 
         # Perform anonymization based on the given method
-
         # Anonymize using the COQUI method
         if method == self.ANONYMIZATION_METHODS['COQUI']:
             anonymize_coqui(source_files=source_files, target_files=target_files, output_files=output_files)
@@ -66,7 +65,7 @@ class VoiceAnonymizer:
         elif method == self.ANONYMIZATION_METHODS['FREEVC']:
             anonymize_freevc(source_files=source_files, target_files=target_files, output_files=output_files)
 
-        # Anonymize using the FREEVC method
+        # Anonymize using the SPEECHT5 method
         elif method == self.ANONYMIZATION_METHODS['SPEECHT5']:
             anonymize_speechT5(source_files=source_files, target_files=target_files, output_files=output_files)
 

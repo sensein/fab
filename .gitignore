@@ -6,9 +6,10 @@ tools/pycochleagram
 tools/speechbrain
 tools/TTS
 tools/FreeVC
+projects
 
 # tmp folders
-children-voice-detection/tmp 
+projects/children-voice-detection/tmp
 
 # Apple
 .DS_Store
@@ -143,7 +144,7 @@ ENV/
 env.bak/
 venv.bak/
 data
-audio_representation/pretrained_models/
+tools/audio_representation/pretrained_models/
 
 # Spyder project settings
 .spyderproject
