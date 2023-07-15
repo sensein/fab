@@ -1,5 +1,14 @@
 # TODO: in case you want to play with this code, please update source_files* and target_files* lists
 
+import sys
+import os
+
+path_folder = '../'
+script_directory = os.path.dirname(os.path.abspath(__file__))
+path_folder_absolute_path = os.path.join(script_directory, path_folder)
+# adding freeVC_folder to the system path
+sys.path.insert(0, path_folder_absolute_path)
+
 # Import the VoiceAnonymizer class from the anonymizer module
 from anonymizer import VoiceAnonymizer
 
@@ -28,7 +37,7 @@ anonymizer = VoiceAnonymizer()
 # Anonymize using the speechT5 method
 anonymizer.anonymize(method='speechT5', source_files=source_files0, target_files=target_files0, output_files=output_files0)
 
-'''
+"""
 # Anonymize using the Coqui method
 anonymizer.anonymize(method='coqui', source_files=source_files1, target_files=target_files1, output_files=output_files1)
 
@@ -37,4 +46,4 @@ anonymizer.anonymize(method='freevc', source_files=source_files2, target_files=t
 
 # Anonymize using the McAdams method
 anonymizer.anonymize(method='mcadams', source_files=source_files3, output_files=output_files3)
-'''
+"""

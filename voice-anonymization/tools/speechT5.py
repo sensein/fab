@@ -16,7 +16,7 @@ from tqdm import tqdm
 processor = SpeechT5Processor.from_pretrained("microsoft/speecht5_vc")
 model = SpeechT5ForSpeechToSpeech.from_pretrained("microsoft/speecht5_vc")
 vocoder = SpeechT5HifiGan.from_pretrained("microsoft/speecht5_hifigan")
-speakerEmbeddingExtractor = AudioRepresentation(model_name="SpkrecEcapaVoxceleb")
+speakerEmbeddingExtractor = AudioRepresentation(model_name="SpkrecEcapaVoxceleb", model_checkpoint="speechbrain/spkrec-xvect-voxceleb")
 
 
 def anonymize(source_files, target_files, output_files):
@@ -27,11 +27,6 @@ def anonymize(source_files, target_files, output_files):
                                             return_tensors="pt")
         target_waveform, target_sample_rate = torchaudio.load(target_file)
         target_speaker_embeddings = speakerEmbeddingExtractor.contextual_encoding(target_waveform)
-
-        print('source_audio_descriptor["input_values"].shape')
-        print(source_audio_descriptor["input_values"].shape)
-        print('target_speaker_embeddings.shape')
-        print(target_speaker_embeddings.shape)
         output_audio_descriptor = model.generate_speech(source_audio_descriptor["input_values"].squeeze(1),
                                                         target_speaker_embeddings.squeeze(1), vocoder=vocoder)
         sf.write(output_file, output_audio_descriptor.numpy(), samplerate=source_sample_rate)

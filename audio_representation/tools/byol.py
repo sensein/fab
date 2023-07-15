@@ -1,38 +1,30 @@
-import os
 import inspect
-from speechbrain.pretrained import EncoderClassifier
+import serab_byols
+import torch
 
 
 class AudioEncoder:
-    def __init__(self, model_name='ecapa_tdnn', model_checkpoint=None, models_save_dir=None, extra_params=None):
+    def __init__(self, model_name='pyannote_audio', model_checkpoint=None, models_save_dir='', extra_params=None):
         """
         Initialize the AudioEncoder class.
-
-        Args:
-            model_checkpoint (str): The checkpoint name or path of the pretrained encoder model.
-            models_save_dir (str): The directory where the pretrained models are saved.
         """
         # Check if temporal audio representation extraction method is available
         self.time_dependent_representation_available = self.check_temporal_audio_extraction()
         # Check if time independent audio representation extraction method is available
         self.time_independent_representation_available = self.check_time_independent_audio_extraction()
 
-        if model_checkpoint is None:
-            model_checkpoint = "speechbrain/spkrec-ecapa-voxceleb"
-
         if models_save_dir is None:
             models_save_dir = "../pretrained_models/"
+        if model_checkpoint is None:
+            self.model_checkpoint = 'cvt'
+            self.checkpoint_path = serab_byols.__file__.replace('serab_byols/__init__.py', '') + "checkpoints/cvt_s1-d1-e64_s2-d1-e256_s3-d1-e512_BYOLAs64x96-osandbyolaloss6373-e100-bs256-lr0003-rs42.pth"
+            self.cfg_path = serab_byols.__file__.replace('serab_byols/__init__.py', 'serab_byols/config.yaml')
+        else:
+            self.model_checkpoint = model_checkpoint
+            self.checkpoint_path = extra_params['checkpoint_path'] or None
+            self.cfg_path = extra_params['cfg_path'] or None
 
-        # Get the absolute path of the directory where the script is located
-        script_directory = os.path.dirname(os.path.abspath(__file__))
-        # Get the absolute path of the models save directory
-        models_save_dir_absolute_path = os.path.join(script_directory, models_save_dir)
-
-        # Load the pretrained encoder model
-        self.encoder = EncoderClassifier.from_hparams(source=model_checkpoint,
-                                                      savedir=os.path.join(models_save_dir_absolute_path,
-                                                                           model_checkpoint.replace("/", "_")))
-        self.extra_params = extra_params
+        self.encoder = serab_byols.load_model(self.checkpoint_path, self.model_checkpoint, self.cfg_path)
 
     def check_temporal_audio_extraction(self):
         """
@@ -56,25 +48,6 @@ class AudioEncoder:
         return 'time_independent_audio_representation_extraction' in dir(self) and \
             inspect.ismethod(getattr(self, 'time_independent_audio_representation_extraction'))
 
-    def temporal_audio_representation_extraction(self, input_waveforms):
-        """
-        Extract temporal audio representations from input waveforms.
-
-        Args:
-            input_waveforms (Tensor): Input waveforms for which representations need to be extracted.
-
-        Returns:
-            Tensor: Temporal audio representations (embeddings) of the input waveforms.
-        Raises:
-            NotImplementedError: If temporal audio representation extraction is not available.
-        """
-        # Check if temporal audio representation extraction is available
-        if not self.time_dependent_representation_available:
-            raise NotImplementedError("Temporal audio representation extraction is not available.")
-        # Encode the input waveforms to obtain embeddings
-        embeddings = self.encoder.encode_temp_batch(input_waveforms)
-        return embeddings
-
     def time_independent_audio_representation_extraction(self, input_waveforms):
         """
         Extract time independent audio representations from input waveforms.
@@ -90,6 +63,6 @@ class AudioEncoder:
         # Check if time independent audio representation extraction is available
         if not self.time_independent_representation_available:
             raise NotImplementedError("Time independent audio representation extraction is not available.")
-        # Encode the input waveforms to obtain embeddings
-        embeddings = self.encoder.encode_batch(input_waveforms).squeeze(1)
+
+        embeddings = serab_byols.get_scene_embeddings(input_waveforms, self.encoder, self.cfg_path)
         return embeddings
