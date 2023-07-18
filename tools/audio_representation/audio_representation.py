@@ -8,7 +8,6 @@ from tools.whisper import AudioEncoder as Whisper
 from tools.pyannote_audio_speaker_embeddings import AudioEncoder as PyannoteAudioSpeakerEmbeddings
 from tools.byol import AudioEncoder as Byol
 
-
 class AudioRepresentation:
     def __init__(self, model_name, model_checkpoint=None, models_save_dir=None, extra_params=None):
         """
@@ -22,7 +21,7 @@ class AudioRepresentation:
         """
         self.model_name = model_name
         self.model_checkpoint = model_checkpoint
-
+        
         # Instantiate the appropriate audio encoder based on the model_name
         if model_name.startswith("EcapaTDNN"):
             self.model = EcapaTDNN(model_name=model_name, model_checkpoint=model_checkpoint,
