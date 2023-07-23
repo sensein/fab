@@ -31,24 +31,28 @@ output_files2 = ['./output2.wav']
 source_files3 = ['./source.wav']
 output_files3 = ['./output3.wav']
 
-# Define the source, target, and output files for the third anonymization
+# Define the source, target, and output files for the 4th anonymization
 source_files4 = ['./source.wav']
 output_files4 = ['./output4.wav']
 
 
-# Create an instance of VoiceAnonymizer
-anonymizer = VoiceAnonymizer()
-
 # Anonymize using the speechT5 method
-anonymizer.anonymize(method='speechT5', source_files=source_files0, target_files=target_files0, output_files=output_files0)
+anonymizer = VoiceAnonymizer(method='speechT5')
+anonymizer.anonymize(source_files=source_files0, target_files=target_files0, output_files=output_files0)
 
 # Anonymize using the Coqui method
-anonymizer.anonymize(method='coqui', source_files=source_files1, target_files=target_files1, output_files=output_files1)
+anonymizer = VoiceAnonymizer(method='coqui')
+anonymizer.anonymize(source_files=source_files1, target_files=target_files1, output_files=output_files1)
 
 # Anonymize using the FreeVC method
-anonymizer.anonymize(method='freevc', source_files=source_files2, target_files=target_files2, output_files=output_files2)
+anonymizer = VoiceAnonymizer(method='freevc')
+anonymizer.anonymize(source_files=source_files2, target_files=target_files2, output_files=output_files2)
 
 # Anonymize using the McAdams method
-anonymizer.anonymize(method='mcadams', source_files=source_files3, output_files=output_files3)
-
-# TODO: test abdul-kareem's method
+anonymizer = VoiceAnonymizer(method='mcadams')
+anonymizer.anonymize(source_files=source_files3, output_files=output_files3)
+'''
+# Anonymize using the PIR method
+#anonymizer = VoiceAnonymizer(method='pir')
+#anonymizer.anonymize(source_files=source_files4, output_files=output_files4)
+'''
