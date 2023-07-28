@@ -3,15 +3,9 @@ import sys
 import os
 import warnings
 
-# Define target folder and script directory paths
-target_folder = '../'
-script_directory = os.path.dirname(os.path.abspath(__file__))
-target_folder_absolute_path = os.path.join(script_directory, target_folder)
-
-# Add target_folder to the system path
-sys.path.insert(0, target_folder_absolute_path)
-
-from audio_representation import AudioRepresentation
+import sys
+sys.path.append('../../..')
+from tools.audio_representation import AudioRepresentation
 
 # List of representations to test
 representations_to_test = [

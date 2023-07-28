@@ -1,12 +1,12 @@
 import torch
-from tools.ecapa_tdnn import AudioEncoder as EcapaTDNN
-from tools.wavLM_HuBERT_wav2vec2_data2vec import AudioEncoder as WavLMHuBERTWav2vec2Data2vec
-from tools.human_cochleagram import AudioEncoder as HumanCochleagram
-from tools.log_mel_spectrogram import AudioEncoder as LogMelSpectrogram
-from tools.s3prl_apc_tera import AudioEncoder as S3prl
-from tools.whisper import AudioEncoder as Whisper
-from tools.pyannote_audio_speaker_embeddings import AudioEncoder as PyannoteAudioSpeakerEmbeddings
-from tools.byol import AudioEncoder as Byol
+from .tools.ecapa_tdnn import AudioEncoder as EcapaTDNN
+from .tools.wavLM_HuBERT_wav2vec2_data2vec import AudioEncoder as WavLMHuBERTWav2vec2Data2vec
+from .tools.human_cochleagram import AudioEncoder as HumanCochleagram
+from .tools.log_mel_spectrogram import AudioEncoder as LogMelSpectrogram
+from .tools.s3prl_apc_tera import AudioEncoder as S3prl
+from .tools.whisper import AudioEncoder as Whisper
+from .tools.pyannote_audio_speaker_embeddings import AudioEncoder as PyannoteAudioSpeakerEmbeddings
+from .tools.byol import AudioEncoder as Byol
 
 class AudioRepresentation:
     def __init__(self, model_name, model_checkpoint=None, models_save_dir=None, extra_params=None):

@@ -6,6 +6,7 @@ from scipy.io.wavfile import write
 from tqdm import tqdm
 from pathlib import Path
 import sys
+import torchaudio
 
 # Set up file paths
 freeVC_folder = '../../FreeVC'
@@ -125,4 +126,5 @@ class VoiceAnonymizer:
 
                 # Save the synthesized audio to the output file
                 Path(os.path.dirname(out)).mkdir(parents=True, exist_ok=True)
+                #torchaudio.save(out, audio, self.hps.data.sampling_rate, encoding="PCM_S", bits_per_sample=16)
                 write(out, self.hps.data.sampling_rate, audio)

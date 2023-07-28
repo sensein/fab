@@ -1,9 +1,9 @@
 # Import the necessary anonymization methods from different modules
-from tools.coqui import VoiceAnonymizer as CoquiAnonimizer
-from tools.freevc import VoiceAnonymizer as FreeVCAnonimizer
-from tools.mcadams import VoiceAnonymizer as McAdamsAnonimizer
-from tools.speechT5 import VoiceAnonymizer as SpeechT5Anonimizer
-#from tools.phonetic_intermediate_representations import VoiceAnonymizer as PirAnonimizer
+from .tools.coqui import VoiceAnonymizer as CoquiAnonimizer
+from .tools.freevc import VoiceAnonymizer as FreeVCAnonimizer
+from .tools.mcadams import VoiceAnonymizer as McAdamsAnonimizer
+from .tools.speechT5 import VoiceAnonymizer as SpeechT5Anonimizer
+#from .tools.phonetic_intermediate_representations import VoiceAnonymizer as PirAnonimizer
 
 
 # Define the VoiceAnonymizer class
@@ -42,24 +42,24 @@ class VoiceAnonymizer:
         # Anonymize using the COQUI method
         if self.method == self.ANONYMIZATION_METHODS['COQUI']:
             self.anonymizer = CoquiAnonimizer(extra_params=extra_params)
-        # Anonymize using the FREEVC method
-        elif self.method == self.ANONYMIZATION_METHODS['FREEVC']:
-            self.anonymizer = FreeVCAnonimizer(extra_params=extra_params)
         # Anonymize using the SPEECHT5 method
         elif self.method == self.ANONYMIZATION_METHODS['SPEECHT5']:
             self.anonymizer = SpeechT5Anonimizer(extra_params=extra_params)
+        # Anonymize using the FREEVC method
+        elif self.method == self.ANONYMIZATION_METHODS['FREEVC']:
+            self.anonymizer = FreeVCAnonimizer(extra_params=extra_params)
         # Anonymize using the MCADAMS method
         elif self.method == self.ANONYMIZATION_METHODS['MCADAMS']:
             self.anonymizer = McAdamsAnonimizer(extra_params=extra_params)
         # Raise an error if the given method is invalid
         else:
             raise ValueError(f"Invalid anonymization method: {self.method}")
-        # Anonymize using the PIR method
+
         '''
+        # Anonymize using the PIR method
         elif self.method == self.ANONYMIZATION_METHODS['PIR']:
             self.anonymizer = PirAnonimizer(extra_params=extra_params)
         '''
-
             
     # Anonymize method for performing the actual anonymization
     def anonymize(self, source_files, target_files=None, output_files=None):

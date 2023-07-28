@@ -5,16 +5,8 @@ import soundfile as sf
 import torchaudio
 from tqdm import tqdm
 
-# Set up file paths
-audio_representation_folder = '../../audio_representation'
-script_directory = os.path.dirname(os.path.abspath(__file__))
-audio_representation_folder_absolute_path = os.path.join(script_directory, audio_representation_folder)
-
-# Add audio_representation_folder to the system path
-sys.path.insert(0, audio_representation_folder_absolute_path)
-
 # Import modules from the audio_representation library
-from audio_representation import AudioRepresentation
+from tools.audio_representation import AudioRepresentation
 
 # Import models from the transformers library
 from transformers import SpeechT5Processor, SpeechT5ForSpeechToSpeech, SpeechT5HifiGan

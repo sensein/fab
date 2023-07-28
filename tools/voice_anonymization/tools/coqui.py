@@ -2,6 +2,7 @@
 from TTS.api import TTS  # TTS stands for Text-to-Speech but in this context, it's used for voice conversion
 import torch
 from tqdm import tqdm  # tqdm is used to create a progress bar for the conversion process
+import torchaudio
 
 class VoiceAnonymizer:
     def __init__(self, extra_params=None):

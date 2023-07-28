@@ -7,6 +7,13 @@ import audiosegment
 from pathlib import Path
 from scipy.io import wavfile
 
+# Set up file paths
+pir_folder = '../../pir'
+script_directory = os.path.dirname(os.path.abspath(__file__))
+pir_folder_absolute_path = os.path.join(script_directory, pir_folder)
+# Adding freeVC_folder to the system path
+sys.path.insert(0, pir_folder_absolute_path)
+
 from demo_inference.demo_tts import DemoTTS
 from demo_inference.demo_asr import DemoASR
 from demo_inference.demo_anonymization import DemoAnonymizer
@@ -31,9 +38,9 @@ class VoiceAnonymizer:
         # Check if a CUDA-enabled GPU is available, otherwise use CPU
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         
-        self.path_to_anon_models = Path("models", "anonymization")
-        self.path_to_asr_models = Path("models", "asr")
-        self.path_to_tts_models = Path("models", "tts")
+        self.path_to_anon_models = Path(pir_folder_absolute_path, "models", "anonymization")
+        self.path_to_asr_models = Path(pir_folder_absolute_path, "models", "asr")
+        self.path_to_tts_models = Path(pir_folder_absolute_path, "models", "tts")
 
         self.synthesis_model = DemoTTS(
             model_paths=self.path_to_tts_models, 

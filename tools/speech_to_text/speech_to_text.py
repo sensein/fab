@@ -1,6 +1,6 @@
 # Import Transcriber classes from tools.whisper and tools.mms modules
-from tools.whisper import Transcriber as Whisper
-from tools.mms import Transcriber as MassivelyMultilingualSpeech
+from .tools.whisper import Transcriber as Whisper
+from .tools.mms import Transcriber as MassivelyMultilingualSpeech
 
 # Create a generic Transcriber class that wraps different ASR models based on model_name
 class Transcriber:

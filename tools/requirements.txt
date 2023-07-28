@@ -4,3 +4,7 @@ ipywidgets
 scikit-learn
 datasets
 openai-whisper
+openpyxl
+pylangacq
+jiwer
+contractions
