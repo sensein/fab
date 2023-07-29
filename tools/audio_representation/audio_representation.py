@@ -5,7 +5,7 @@ from .tools.human_cochleagram import AudioEncoder as HumanCochleagram
 from .tools.log_mel_spectrogram import AudioEncoder as LogMelSpectrogram
 from .tools.s3prl_apc_tera import AudioEncoder as S3prl
 from .tools.whisper import AudioEncoder as Whisper
-from .tools.pyannote_audio_speaker_embeddings import AudioEncoder as PyannoteAudioSpeakerEmbeddings
+#from .tools.pyannote_audio_speaker_embeddings import AudioEncoder as PyannoteAudioSpeakerEmbeddings
 from .tools.byol import AudioEncoder as Byol
 
 class AudioRepresentation:
@@ -40,15 +40,18 @@ class AudioRepresentation:
         elif model_name.startswith("Whisper"):
             self.model = Whisper(model_name=model_name, model_checkpoint=model_checkpoint,
                                  models_save_dir=models_save_dir, extra_params=extra_params)
-        elif model_name.startswith("pyannote_audio"):
-            self.model = PyannoteAudioSpeakerEmbeddings(model_name=model_name, model_checkpoint=model_checkpoint,
-                                                        models_save_dir=models_save_dir, extra_params=extra_params)
         elif model_name.startswith("Byol"):
             self.model = Byol(model_name=model_name, model_checkpoint=model_checkpoint,
                               models_save_dir=models_save_dir, extra_params=extra_params)
         else:
             # Raise a ValueError if an invalid model is specified
             raise ValueError("Invalid model specified.")
+
+        '''
+        elif model_name.startswith("pyannote_audio"):
+            self.model = PyannoteAudioSpeakerEmbeddings(model_name=model_name, model_checkpoint=model_checkpoint,
+                                                    models_save_dir=models_save_dir, extra_params=extra_params)
+        '''
 
         # Check the availability of different encoding options
         self.temporal_encoding_exists = self.model.check_temporal_audio_extraction()
