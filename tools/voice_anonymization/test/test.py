@@ -28,11 +28,13 @@ output_files3 = ['./output3.wav']
 source_files4 = ['./source.wav']
 output_files4 = ['./output4.wav']
 
+
+'''
 # Anonymize using the PIR method
 anonymizer = VoiceAnonymizer(method='pir')
 anonymizer.anonymize(source_files=source_files4, output_files=output_files4)
-
 '''
+
 # Anonymize using the FreeVC method
 anonymizer = VoiceAnonymizer(method='freevc')
 anonymizer.anonymize(source_files=source_files2, target_files=target_files2, output_files=output_files2)
@@ -48,4 +50,3 @@ anonymizer.anonymize(source_files=source_files1, target_files=target_files1, out
 # Anonymize using the McAdams method
 anonymizer = VoiceAnonymizer(method='mcadams')
 anonymizer.anonymize(source_files=source_files3, output_files=output_files3)
-'''
