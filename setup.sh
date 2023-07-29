@@ -74,6 +74,28 @@ pip install --editable .
 cd ..
 #################### speechbrain #########################
 
+#################### s3prl #########################
+repo_url="https://github.com/fabiocat93/s3prl.git"
+repo_dir="s3prl"
+
+if [ -d "$repo_dir" ]; then
+  # Repository exists, pull updates
+  echo "Repository '$repo_dir' exists, pulling updates..."
+  cd "$repo_dir"
+  git pull
+  cd ..
+else
+  # Repository does not exist, clone it
+  echo "Repository '$repo_dir' does not exist, cloning..."
+  git clone "$repo_url" "$repo_dir"
+fi
+
+cd "$repo_dir"
+pip install -e ".[all]"
+cd ..
+#################### s3prl #########################
+
+
 #################### serab-byols #########################
 repo_url="https://github.com/GasserElbanna/serab-byols.git"
 repo_dir="serab-byols"
@@ -95,26 +117,6 @@ pip install -e .
 cd ..
 #################### serab-byols #########################
 
-#################### s3prl #########################
-repo_url="https://github.com/fabiocat93/s3prl.git"
-repo_dir="s3prl"
-
-if [ -d "$repo_dir" ]; then
-  # Repository exists, pull updates
-  echo "Repository '$repo_dir' exists, pulling updates..."
-  cd "$repo_dir"
-  git pull
-  cd ..
-else
-  # Repository does not exist, clone it
-  echo "Repository '$repo_dir' does not exist, cloning..."
-  git clone "$repo_url" "$repo_dir"
-fi
-
-cd "$repo_dir"
-pip install -e ".[all]"
-cd ..
-#################### s3prl #########################
 
 #################### pycochleagram #########################
 repo_url="https://github.com/fabiocat93/pycochleagram.git"
@@ -154,7 +156,7 @@ else
 fi
 
 cd "$repo_dir"
-pip install -e .[all,dev,notebooks]
+pip install -e .
 cd ..
 #################### TTS #########################
 
