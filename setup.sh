@@ -31,25 +31,25 @@ fi
 cd $tools_folder
 
 #################### pyannote-audio #########################
-repo_url="https://github.com/fabiocat93/pyannote-audio.git"
-repo_dir="pyannote-audio"
+#repo_url="https://github.com/fabiocat93/pyannote-audio.git"
+#repo_dir="pyannote-audio"
 
-if [ -d "$repo_dir" ]; then
+#if [ -d "$repo_dir" ]; then
   # Repository exists, pull updates
-  echo "Repository '$repo_dir' exists, pulling updates..."
-  cd "$repo_dir"
-  git pull
-  cd ..
-else
-  # Repository does not exist, clone it
-  echo "Repository '$repo_dir' does not exist, cloning..."
-  git clone "$repo_url" "$repo_dir"
-fi
+#  echo "Repository '$repo_dir' exists, pulling updates..."
+#  cd "$repo_dir"
+#  git pull
+#  cd ..
+#else
+#  # Repository does not exist, clone it
+#  echo "Repository '$repo_dir' does not exist, cloning..."
+#  git clone "$repo_url" "$repo_dir"
+#fi
 
-cd "$repo_dir"
-pip install -e .[dev,testing]
-pre-commit install
-cd ..
+#cd "$repo_dir"
+#pip install -e .[dev,testing]
+#pre-commit install
+#cd ..
 #################### pyannote-audio #########################
 
 #################### speechbrain #########################
