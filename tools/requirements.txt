@@ -8,3 +8,6 @@ openpyxl
 pylangacq
 jiwer
 contractions
+mecab-python3
+unidic-lite
+

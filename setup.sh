@@ -35,7 +35,11 @@ cd $tools_folder
 #repo_dir="pyannote-audio"
 
 #if [ -d "$repo_dir" ]; then
+<<<<<<< HEAD
 #  # Repository exists, pull updates
+=======
+  # Repository exists, pull updates
+>>>>>>> 8c2edc21dc9d0e462c449534e0d8c7d20684b5c4
 #  echo "Repository '$repo_dir' exists, pulling updates..."
 #  cd "$repo_dir"
 #  git pull
@@ -49,7 +53,11 @@ cd $tools_folder
 #cd "$repo_dir"
 #pip install -e .[dev,testing]
 #pre-commit install
+<<<<<<< HEAD
 #d ..
+=======
+#cd ..
+>>>>>>> 8c2edc21dc9d0e462c449534e0d8c7d20684b5c4
 #################### pyannote-audio #########################
 
 #################### speechbrain #########################
@@ -74,6 +82,28 @@ pip install --editable .
 cd ..
 #################### speechbrain #########################
 
+#################### s3prl #########################
+repo_url="https://github.com/fabiocat93/s3prl.git"
+repo_dir="s3prl"
+
+if [ -d "$repo_dir" ]; then
+  # Repository exists, pull updates
+  echo "Repository '$repo_dir' exists, pulling updates..."
+  cd "$repo_dir"
+  git pull
+  cd ..
+else
+  # Repository does not exist, clone it
+  echo "Repository '$repo_dir' does not exist, cloning..."
+  git clone "$repo_url" "$repo_dir"
+fi
+
+cd "$repo_dir"
+pip install -e ".[all]"
+cd ..
+#################### s3prl #########################
+
+
 #################### serab-byols #########################
 repo_url="https://github.com/GasserElbanna/serab-byols.git"
 repo_dir="serab-byols"
@@ -95,26 +125,6 @@ pip install -e .
 cd ..
 #################### serab-byols #########################
 
-#################### s3prl #########################
-repo_url="https://github.com/fabiocat93/s3prl.git"
-repo_dir="s3prl"
-
-if [ -d "$repo_dir" ]; then
-  # Repository exists, pull updates
-  echo "Repository '$repo_dir' exists, pulling updates..."
-  cd "$repo_dir"
-  git pull
-  cd ..
-else
-  # Repository does not exist, clone it
-  echo "Repository '$repo_dir' does not exist, cloning..."
-  git clone "$repo_url" "$repo_dir"
-fi
-
-cd "$repo_dir"
-pip install -e ".[all]"
-cd ..
-#################### s3prl #########################
 
 #################### pycochleagram #########################
 repo_url="https://github.com/fabiocat93/pycochleagram.git"
@@ -154,7 +164,7 @@ else
 fi
 
 cd "$repo_dir"
-pip install -e .[all,dev,notebooks]
+pip install -e .
 cd ..
 #################### TTS #########################
 
