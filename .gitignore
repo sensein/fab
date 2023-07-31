@@ -6,7 +6,7 @@ tools/pycochleagram
 tools/speechbrain
 tools/TTS
 tools/FreeVC
-projects
+#projects
 
 # tmp folders
 projects/children-voice-detection/tmp
