@@ -28,23 +28,18 @@ output_files3 = ['./output3.wav']
 source_files4 = ['./source.wav']
 output_files4 = ['./output4.wav']
 
-<<<<<<< HEAD
-=======
+# Anonymize using the speechT5 method
+anonymizer = VoiceAnonymizer(method='speechT5')
+anonymizer.anonymize(source_files=source_files0, target_files=target_files0, output_files=output_files0)
 
 '''
 # Anonymize using the PIR method
 anonymizer = VoiceAnonymizer(method='pir')
 anonymizer.anonymize(source_files=source_files4, output_files=output_files4)
-'''
 
->>>>>>> 8c2edc21dc9d0e462c449534e0d8c7d20684b5c4
 # Anonymize using the FreeVC method
 anonymizer = VoiceAnonymizer(method='freevc')
 anonymizer.anonymize(source_files=source_files2, target_files=target_files2, output_files=output_files2)
-
-# Anonymize using the speechT5 method
-anonymizer = VoiceAnonymizer(method='speechT5')
-anonymizer.anonymize(source_files=source_files0, target_files=target_files0, output_files=output_files0)
 
 # Anonymize using the Coqui method
 anonymizer = VoiceAnonymizer(method='coqui')
@@ -53,13 +48,9 @@ anonymizer.anonymize(source_files=source_files1, target_files=target_files1, out
 # Anonymize using the McAdams method
 anonymizer = VoiceAnonymizer(method='mcadams')
 anonymizer.anonymize(source_files=source_files3, output_files=output_files3)
-<<<<<<< HEAD
-'''
+
 
 # Anonymize using the PIR method
 anonymizer = VoiceAnonymizer(method='pir')
 anonymizer.anonymize(source_files=source_files4, output_files=output_files4)
 '''
-
-=======
->>>>>>> 8c2edc21dc9d0e462c449534e0d8c7d20684b5c4

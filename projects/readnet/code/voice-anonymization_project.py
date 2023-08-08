@@ -18,7 +18,7 @@ import random
 import string
 import logging
 from jiwer import wer
-from statistics import mean, stdev
+from statistics import mean, stdev, StatisticsError
 import json
 import ast
 import argparse
@@ -95,7 +95,29 @@ def remove_punctuation_and_lower(text):
     text = ''.join(char for char in text if char not in string.punctuation)
     return text
 
-def get_filename(row):
+def group_files_by_participant_and_i(files):
+    grouped_files = {}
+    
+    for file in files:
+        if file.endswith(".wav"):
+            parts = file.split("##")
+            if len(parts) != 2:
+                continue
+
+            participant_i, rest = parts
+            participant, i = participant_i.split("___")
+
+            key = (participant, i)
+
+            if key not in grouped_files:
+                grouped_files[key] = []
+
+            grouped_files[key].append(file)
+    
+    result = list(grouped_files.values())
+    return result
+
+def get_utility_filename(row):
     return os.path.basename(row['path_to_audio_segment_file'])
 
 # The process_files_to_embeddings function processes all the audio files in a given folder to extract speaker embeddings.
@@ -124,7 +146,7 @@ def process_files_to_embeddings_and_transcripts(path_to_audio_folder, handmade_t
         print('xlsx file does not exist')
         if handmade_transcript_available:
             df = pd.read_excel(os.path.join(path_to_audio_folder, 'segments.xlsx'), engine='openpyxl')
-            df['audio_segment_file_base_name'] = df.apply(get_filename, axis=1)
+            df['audio_segment_file_base_name'] = df.apply(get_utility_filename, axis=1)
 
         whisper_transcriber = Transcriber(
             model_name='whisper',
@@ -143,38 +165,48 @@ def process_files_to_embeddings_and_transcripts(path_to_audio_folder, handmade_t
         )
         
         file_details = []
-        for file_name in os.listdir(path_to_audio_folder):
+        pattern = r'##\d+'
+        for file_names in group_files_by_participant_and_i(os.listdir(path_to_audio_folder)):
+            file_paths = []
+            waveforms = []
+            whisper_texts = []
+            mms_texts = []
+            for file_name in file_names:
+                utility_file_name = re.sub(pattern, '', file_name)
 
-            if file_name.endswith(".wav"):
-                print(file_name)
+                #print(file_name)
                 file_path = os.path.join(path_to_audio_folder, file_name)
+                file_paths.append(file_path)
                 waveform, sr = load_audio(file_path)
-                speaker = file_name.split("_")[0]
+                waveforms.append(waveform)
+                speaker = file_name.split("___")[0] # df.loc[df['audio_segment_file_base_name'] == file_name, 'participant'].values[0]
 
                 raw_response, whisper_text = whisper_transcriber.transcribe(waveform)
-                
-                print("\n")
+
+                #print("\n")
 
                 if whisper_text is None:
                     whisper_text = ""
                 else:
                     whisper_text = remove_punctuation_and_lower(whisper_text[0])
                     #print("whisper_text")
-                    print(whisper_text)
+                    #print(whisper_text)
+                whisper_texts.append(whisper_text)
                 raw_response, mms_text = mms_transcriber.transcribe(waveform)
                 if mms_text is None:
                     mms_text = ""
                 else:
                     mms_text = remove_punctuation_and_lower(mms_text[0])
                     #print("mms_text")
-                    print(mms_text)
+                    #print(mms_text)
+                mms_texts.append(mms_text)
 
-                if handmade_transcript_available:
-                    transcript = remove_punctuation_and_lower(df.loc[df['audio_segment_file_base_name'] == file_name, 'text'].values[0])
-                    print(transcript)
-                    file_details.append([file_path, file_name, speaker, waveform.squeeze(), transcript, whisper_text, mms_text])
-                else:
-                    file_details.append([file_path, file_name, speaker, waveform.squeeze(), whisper_text, mms_text])
+            if handmade_transcript_available:
+                transcript = remove_punctuation_and_lower(df.loc[df['audio_segment_file_base_name'] == utility_file_name, 'text'].values[0])
+                #print(transcript)
+                file_details.append([file_paths, utility_file_name, speaker, torch.cat(waveforms, dim=1).squeeze(), transcript, " ".join(whisper_texts), " ".join(mms_texts)])
+            else:
+                file_details.append([file_paths, utility_file_name, speaker, torch.cat(waveforms, dim=1).squeeze(), " ".join(whisper_texts), " ".join(mms_texts)])
 
         if handmade_transcript_available:
             df = pd.DataFrame(file_details, columns=["Path", "Name", "Speaker", "Waveform", "Handmade transcript", "Whisper transcript", "MMS transcript"])
@@ -362,13 +394,31 @@ def extract_detailed_WER(df, anonymized_df):
     h_vs_am__macro = mean(h_vs_am__list)
     w_vs_aw__macro = mean(w_vs_aw__list)
     m_vs_am__macro = mean(m_vs_am__list)
-    
-    h_vs_w__macro2 = stdev(h_vs_w__list)
-    h_vs_m__macro2 = stdev(h_vs_m__list)
-    h_vs_aw__macro2 = stdev(h_vs_aw__list)
-    h_vs_am__macro2 = stdev(h_vs_am__list)
-    w_vs_aw__macro2 = stdev(w_vs_aw__list)
-    m_vs_am__macro2 = stdev(m_vs_am__list)
+
+    try:
+        h_vs_w__macro2 = stdev(h_vs_w__list)
+    except StatisticsError as e:
+        h_vs_w__macro2 = 0
+    try:
+        h_vs_m__macro2 = stdev(h_vs_m__list)
+    except StatisticsError as e:
+        h_vs_m__macro2 = 0
+    try:
+        h_vs_aw__macro2 = stdev(h_vs_aw__list)
+    except StatisticsError as e:
+        h_vs_aw__macro2 = 0
+    try:
+        h_vs_am__macro2 = stdev(h_vs_am__list)
+    except StatisticsError as e:
+        h_vs_am__macro2 = 0    
+    try:
+        w_vs_aw__macro2 = stdev(w_vs_aw__list)
+    except StatisticsError as e:
+        w_vs_aw__macro2 = 0
+    try:
+        m_vs_am__macro2 = stdev(m_vs_am__list)
+    except StatisticsError as e:
+        m_vs_am__macro2 = 0
     
     '''
     print(mean(h_vs_w__list))
