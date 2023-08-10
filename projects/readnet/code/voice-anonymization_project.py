@@ -54,7 +54,6 @@ logging.getLogger('matplotlib.font_manager').disabled = True
 
 
 # utilities
-
 # Create an AudioRepresentation object, audio_repr, using the "EcapaTDNN" model.
 audio_repr = AudioRepresentation(model_name="EcapaTDNN")
 
@@ -124,28 +123,32 @@ def get_utility_filename(row):
 # It loads the audio files, groups them by speaker, and then computes the speaker embeddings for each speaker group.
 def process_files_to_embeddings_and_transcripts(path_to_audio_folder, handmade_transcript_available=False):
     if handmade_transcript_available:
-        xlsx_file_path = os.path.join(path_to_audio_folder, "overall_original.xlsx")
-        xlsx_file_path_raw = os.path.join(path_to_audio_folder, "overall_original_raw.xlsx")
+        xlsx_file_path = os.path.join(path_to_audio_folder, "overall_original.csv")
+        xlsx_file_path_raw = os.path.join(path_to_audio_folder, "overall_original_raw.csv")
     else:
-        xlsx_file_path = os.path.join(path_to_audio_folder, "overall_anonymized.xlsx")
-        xlsx_file_path_raw = os.path.join(path_to_audio_folder, "overall_anonymized_raw.xlsx")
+        xlsx_file_path = os.path.join(path_to_audio_folder, "overall_anonymized.csv")
+        xlsx_file_path_raw = os.path.join(path_to_audio_folder, "overall_anonymized_raw.csv")
     
     print("xlsx_file_path")
     print(xlsx_file_path)
     if os.path.exists(xlsx_file_path):
         print('xlsx file already exists')
         
-        df = pd.read_excel(xlsx_file_path, index_col=None)
+        df = pd.read_csv(xlsx_file_path, sep='\t', index_col=None)
         df['Embeddings'] = df['Embeddings'].apply(ast.literal_eval)
+        df['Waveform'] = df['Waveform'].apply(ast.literal_eval)
         df.fillna("", inplace=True)
         
-        df_raw = pd.read_excel(xlsx_file_path_raw, index_col=None)
+        df_raw = pd.read_csv(xlsx_file_path_raw, sep='\t', index_col=None)
         df_raw['Embeddings'] = df_raw['Embeddings'].apply(ast.literal_eval)
+        df_raw['Waveform'] = df_raw['Waveform'].apply(ast.literal_eval)
         df_raw.fillna("", inplace=True)
+        df['Speaker'] = df['Speaker'].astype(str)
+        df_raw['Speaker'] = df_raw['Speaker'].astype(str)
     else:
         print('xlsx file does not exist')
         if handmade_transcript_available:
-            df = pd.read_excel(os.path.join(path_to_audio_folder, 'segments.xlsx'), engine='openpyxl')
+            df = pd.read_csv(os.path.join(path_to_audio_folder, 'segments.csv'), sep='\t')
             df['audio_segment_file_base_name'] = df.apply(get_utility_filename, axis=1)
 
         whisper_transcriber = Transcriber(
@@ -178,35 +181,32 @@ def process_files_to_embeddings_and_transcripts(path_to_audio_folder, handmade_t
                 file_path = os.path.join(path_to_audio_folder, file_name)
                 file_paths.append(file_path)
                 waveform, sr = load_audio(file_path)
-                waveforms.append(waveform)
-                speaker = file_name.split("___")[0] # df.loc[df['audio_segment_file_base_name'] == file_name, 'participant'].values[0]
+                waveforms.append(waveform.squeeze())
+                speaker = str(file_name.split("___")[0])
+                if speaker.startswith("0") and speaker != "0":
+                    speaker = speaker.lstrip('0')
 
                 raw_response, whisper_text = whisper_transcriber.transcribe(waveform)
-
-                #print("\n")
 
                 if whisper_text is None:
                     whisper_text = ""
                 else:
                     whisper_text = remove_punctuation_and_lower(whisper_text[0])
-                    #print("whisper_text")
-                    #print(whisper_text)
                 whisper_texts.append(whisper_text)
                 raw_response, mms_text = mms_transcriber.transcribe(waveform)
+
                 if mms_text is None:
                     mms_text = ""
                 else:
                     mms_text = remove_punctuation_and_lower(mms_text[0])
-                    #print("mms_text")
-                    #print(mms_text)
                 mms_texts.append(mms_text)
 
             if handmade_transcript_available:
                 transcript = remove_punctuation_and_lower(df.loc[df['audio_segment_file_base_name'] == utility_file_name, 'text'].values[0])
                 #print(transcript)
-                file_details.append([file_paths, utility_file_name, speaker, torch.cat(waveforms, dim=1).squeeze(), transcript, " ".join(whisper_texts), " ".join(mms_texts)])
+                file_details.append([file_paths, utility_file_name, speaker, torch.cat(waveforms, dim=0), transcript, " ".join(whisper_texts), " ".join(mms_texts)])
             else:
-                file_details.append([file_paths, utility_file_name, speaker, torch.cat(waveforms, dim=1).squeeze(), " ".join(whisper_texts), " ".join(mms_texts)])
+                file_details.append([file_paths, utility_file_name, speaker, torch.cat(waveforms, dim=0), " ".join(whisper_texts), " ".join(mms_texts)])
 
         if handmade_transcript_available:
             df = pd.DataFrame(file_details, columns=["Path", "Name", "Speaker", "Waveform", "Handmade transcript", "Whisper transcript", "MMS transcript"])
@@ -248,11 +248,15 @@ def process_files_to_embeddings_and_transcripts(path_to_audio_folder, handmade_t
             waveform = row['Waveform']
             embeddings = extract_embeddings(torch.tensor(waveform))
             all_embeddings.append(embeddings.squeeze())
-        
+
+        df['Waveform'] = df['Waveform'].apply(lambda x: x.tolist())
+        #df['Waveform'] = df['Waveform'].apply(json.dumps)
+
         df['Embeddings'] = [embedding.tolist() for embedding in all_embeddings]
         df['Embeddings'] = df['Embeddings'].apply(json.dumps)
-        df.to_excel(xlsx_file_path, index=None)  
+        df.to_csv(xlsx_file_path, sep='\t', index=None)  
         df['Embeddings'] = df['Embeddings'].apply(ast.literal_eval)
+        #df['Waveform'] = df['Waveform'].apply(ast.literal_eval)
         df.fillna("", inplace=True)
         
         all_embeddings = []
@@ -261,10 +265,14 @@ def process_files_to_embeddings_and_transcripts(path_to_audio_folder, handmade_t
             embeddings = extract_embeddings(torch.tensor(waveform))
             all_embeddings.append(embeddings.squeeze())
         
+        df_raw['Waveform'] = df_raw['Waveform'].apply(lambda x: x.tolist())
+        #df_raw['Waveform'] = df_raw['Waveform'].apply(json.dumps)
+
         df_raw['Embeddings'] = [embedding.tolist() for embedding in all_embeddings]
         df_raw['Embeddings'] = df_raw['Embeddings'].apply(json.dumps)
-        df_raw.to_excel(xlsx_file_path_raw, index=None)  
+        df_raw.to_csv(xlsx_file_path_raw, sep='\t', index=None)  
         df_raw['Embeddings'] = df_raw['Embeddings'].apply(ast.literal_eval)
+        #df_raw['Waveform'] = df_raw['Waveform'].apply(ast.literal_eval)
         df_raw.fillna("", inplace=True)
     return df, df_raw
 
@@ -305,7 +313,7 @@ def compute_eer_and_plot_verification_scores(df1, df2, output_file_path, seed):
     
     pathlib.Path(os.path.dirname(output_file_path)).mkdir(parents=True, exist_ok=True)
     plt.savefig(output_file_path, format='png')
-        # Format the string
+    # Format the string
     data_string = f"{seed},{eer},{threshold}\n"
 
     with open(output_file_path.replace(".png", ".csv"), "a") as file:
@@ -473,7 +481,7 @@ def extract_WER(df, anonymized_df, df_raw, anonymized_df_raw, xlsx_file_path1, x
         "m_vs_am__list_speaker": m_vs_am__list_speaker
     }
     my_df = pd.DataFrame(data)
-    my_df.to_excel(xlsx_file_path1, index=None)  
+    my_df.to_csv(xlsx_file_path1, sep='\t', index=None)  
 
     # MACRO 2 (per audio)
     h_vs_w__list_audio, h_vs_m__list_audio, h_vs_aw__list_audio, h_vs_am__list_audio, w_vs_aw__list_audio, m_vs_am__list_audio, h_vs_w__macro_audio, h_vs_w__macro2_audio, h_vs_m__macro_audio, h_vs_m__macro2_audio, h_vs_aw__macro_audio, h_vs_aw__macro2_audio, h_vs_am__macro_audio, h_vs_am__macro2_audio, w_vs_aw__macro_audio, w_vs_aw__macro2_audio, m_vs_am__macro_audio, m_vs_am__macro2_audio = extract_detailed_WER(df_raw, anonymized_df_raw)
@@ -487,7 +495,7 @@ def extract_WER(df, anonymized_df, df_raw, anonymized_df_raw, xlsx_file_path1, x
         "m_vs_am__list_audio": m_vs_am__list_audio
     }
     my_df = pd.DataFrame(data) 
-    my_df.to_excel(xlsx_file_path2, index=None)  
+    my_df.to_csv(xlsx_file_path2, sep='\t', index=None)  
     
     # OVERALL
     my_df = pd.DataFrame([{"h_vs_w": h_vs_w,
@@ -522,7 +530,7 @@ def extract_WER(df, anonymized_df, df_raw, anonymized_df_raw, xlsx_file_path1, x
                          "m_vs_am__macro2_audio": m_vs_am__macro2_audio 
                          }])
     
-    my_df.to_excel(xlsx_file_path3, index=None)  
+    my_df.to_csv(xlsx_file_path3, sep='\t', index=None)  
     return my_df
 
 def process_audio_file(file_path):
@@ -552,6 +560,21 @@ def get_wav_files_in_folder(folder_path):
                 wav_files.append(file_path)
     return wav_files
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Voice Anonymization Script")
 
@@ -576,8 +599,6 @@ def parse_arguments():
     parser.add_argument(
         "--seed", type=int, default=0, help="Seed number"
     )
-
-    # Add other arguments if needed
 
     return parser.parse_args()
         
@@ -644,7 +665,7 @@ def main():
     # The plot_path variable will store the path to the generated plot.
     plot_path = compute_eer_and_plot_verification_scores(df_raw, df_raw, f'{output_folder}{dataset_name}/EER_raw_{anonymization_tool_name}_{target_speaker_for_anonymization_file[:-4]}_{dataset_name}_original_original.png', seed)
     print("Verification scores computed for original audio.")
-    
+        
     # The plot_path variable will store the path to the generated plot.
     plot_path = compute_eer_and_plot_verification_scores(df, anonymized_df, f'{output_folder}{dataset_name}/EER_{anonymization_tool_name}_{target_speaker_for_anonymization_file[:-4]}_{dataset_name}_{seed}_original_anonymized.png', seed)
     print("Verification scores computed for original vs. anonymized audio.")
@@ -662,7 +683,7 @@ def main():
     print("Verification scores computed for anonymized audio.")
 
     # Perform Word Error Rate (WER) evaluation
-    extract_WER(df, anonymized_df, df_raw, anonymized_df_raw, f'{output_folder}{dataset_name}/WER_speaker_details, {dataset_name}_{anonymization_tool_name}_{target_speaker_for_anonymization_file[:-4]}_{seed}.xlsx', f'{output_folder}{dataset_name}/WER_audio_details_{dataset_name}_{anonymization_tool_name}_{target_speaker_for_anonymization_file[:-4]}_{seed}.xlsx', f'{output_folder}{dataset_name}/WER_overall_{dataset_name}_{anonymization_tool_name}_{target_speaker_for_anonymization_file[:-4]}_{seed}.xlsx')
+    extract_WER(df, anonymized_df, df_raw, anonymized_df_raw, f'{output_folder}{dataset_name}/WER_speaker_details, {dataset_name}_{anonymization_tool_name}_{target_speaker_for_anonymization_file[:-4]}_{seed}.csv', f'{output_folder}{dataset_name}/WER_audio_details_{dataset_name}_{anonymization_tool_name}_{target_speaker_for_anonymization_file[:-4]}_{seed}.csv', f'{output_folder}{dataset_name}/WER_overall_{dataset_name}_{anonymization_tool_name}_{target_speaker_for_anonymization_file[:-4]}_{seed}.csv')
     print("Word Error Rate (WER) evaluation completed.")
     
 if __name__ == "__main__":

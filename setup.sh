@@ -35,11 +35,7 @@ cd $tools_folder
 #repo_dir="pyannote-audio"
 
 #if [ -d "$repo_dir" ]; then
-<<<<<<< HEAD
 #  # Repository exists, pull updates
-=======
-  # Repository exists, pull updates
->>>>>>> 8c2edc21dc9d0e462c449534e0d8c7d20684b5c4
 #  echo "Repository '$repo_dir' exists, pulling updates..."
 #  cd "$repo_dir"
 #  git pull
@@ -53,11 +49,7 @@ cd $tools_folder
 #cd "$repo_dir"
 #pip install -e .[dev,testing]
 #pre-commit install
-<<<<<<< HEAD
-#d ..
-=======
 #cd ..
->>>>>>> 8c2edc21dc9d0e462c449534e0d8c7d20684b5c4
 #################### pyannote-audio #########################
 
 #################### speechbrain #########################

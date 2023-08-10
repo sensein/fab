@@ -57,30 +57,20 @@ class VoiceAnonymizer:
 
             # Load source waveform and sample rate
             source_waveform, source_sample_rate = torchaudio.load(source_file)
-            
+                        
             # Process the source waveform using the SpeechT5 processor
             source_audio_descriptor = self.processor(audio=source_waveform, sampling_rate=source_sample_rate,
                                                 return_tensors="pt")
 
-            source_audio_descriptor["input_values"] = source_audio_descriptor["input_values"].squeeze(1)
-            print("source_audio_descriptor['input_values'].squeeze(1).shape")
-            print(source_audio_descriptor["input_values"].squeeze(1).shape)
-            
             # Load target waveform and sample rate
             target_waveform, target_sample_rate = torchaudio.load(target_file)
 
             # Extract contextual speaker embeddings from the target waveform
             void, target_speaker_embeddings = self.speakerEmbeddingExtractor.contextual_encoding(target_waveform.to(self.device))
 
-            print("target_speaker_embeddings.squeeze(1).shape")
-            print(target_speaker_embeddings.squeeze(1).shape)
-            
             # Generate anonymized voice using the SpeechT5 model and HiFi-GAN vocoder
             output_audio_descriptor = self.model.generate_speech(source_audio_descriptor["input_values"].squeeze(1).to(self.device),
                                                             target_speaker_embeddings.squeeze(1).to(self.device), vocoder=self.vocoder)
-            
-            print("output_audio_descriptor.shape")
-            print(output_audio_descriptor.shape)
 
             # Save the anonymized voice to the output file
             sf.write(output_file, output_audio_descriptor.cpu().numpy(), samplerate=source_sample_rate)

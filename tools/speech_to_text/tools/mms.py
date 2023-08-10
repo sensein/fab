@@ -76,7 +76,7 @@ class Transcriber:
         results = []
         transcripts = []
         for audio in waveforms:
-            inputs = self.processor(audio, sampling_rate=self.sampling_rate, return_tensors="pt")
+            inputs = self.processor(audio, sampling_rate=self.sampling_rate, return_tensors="pt").to(self.device)
             with torch.no_grad():
                 outputs = self.model(**inputs).logits
             ids = torch.argmax(outputs, dim=-1)[0]
