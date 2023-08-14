@@ -96,7 +96,8 @@ class AudioEncoder:
         input_waveforms = input_waveforms.unsqueeze(1)
         embeddings_list = []
         for input_waveform in input_waveforms:
-            embeddings = self.inference({"waveform": input_waveform, "sample_rate": self.sample_rate})
+            with torch.no_grad():
+                embeddings = self.inference({"waveform": input_waveform, "sample_rate": self.sample_rate})
             embeddings_list.append(torch.tensor(embeddings))
         embeddings_list = torch.stack(embeddings_list)
         return embeddings_list, embeddings_list
@@ -119,7 +120,8 @@ class AudioEncoder:
         embeddings_list = []
         for input_waveform in input_waveforms:
             embeddings_by_window = []
-            embeddings = self.inference({"waveform": input_waveform, "sample_rate": self.sample_rate})
+            with torch.no_grad():
+                embeddings = self.inference({"waveform": input_waveform, "sample_rate": self.sample_rate})
             for emb in embeddings:
                 embeddings_by_window.append(emb[1])
             embeddings_list.append(torch.tensor(embeddings_by_window))

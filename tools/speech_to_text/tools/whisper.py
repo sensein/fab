@@ -79,7 +79,8 @@ class Transcriber:
         transcripts = []
         for audio in waveforms_or_files:
             # Transcribe the audio using the Whisper model
-            result = self.model.transcribe(audio, language=self.language, word_timestamps=self.word_timestamps)
+            with torch.no_grad():
+                result = self.model.transcribe(audio, language=self.language, word_timestamps=self.word_timestamps)
             text = result['text']
             results.append(result)
             transcripts.append(text)

@@ -32,6 +32,9 @@ from tools.audio_representation import AudioRepresentation
 from tools.voice_anonymization import VoiceAnonymizer
 from tools.speech_to_text import Transcriber
 
+
+batch_size = 100  # You can adjust this based on your available memory
+
 # The data_folder variable points to the location where we'll store all the data and audio recordings.
 # Think of it as our backstage area, well-organized and ready to showcase the talents of our voices!
 data_folder = "../data/"
@@ -118,6 +121,18 @@ def group_files_by_participant_and_i(files):
 
 def get_utility_filename(row):
     return os.path.basename(row['path_to_audio_segment_file'])
+
+def process_batch_extract_embeddings(df):
+    all_embeddings = []
+
+    for index, row in df.iterrows():
+        waveform = row['Waveform']
+        embeddings = extract_embeddings(torch.tensor(waveform))
+        all_embeddings.append(embeddings.squeeze())
+
+    df['Embeddings'] = [embedding.tolist() for embedding in all_embeddings]
+    df['Embeddings'] = df['Embeddings'].apply(json.dumps)
+    return df
 
 # The process_files_to_embeddings function processes all the audio files in a given folder to extract speaker embeddings.
 # It loads the audio files, groups them by speaker, and then computes the speaker embeddings for each speaker group.
@@ -243,6 +258,42 @@ def process_files_to_embeddings_and_transcripts(path_to_audio_folder, handmade_t
             df = pd.merge(df_waveform, df_transcript_whisper, on='Speaker')
             df = pd.merge(df, df_transcript_mms, on='Speaker')
 
+            
+            
+        # Process 'df' in batches
+        processed_dfs = []
+        for i in range(0, len(df), batch_size):
+            batch_end = min(i+batch_size, len(df)-i)
+            print("batch_end")
+            print(batch_end)
+            batch_df = df.iloc[i:batch_end]
+            processed_dfs.append(process_batch(batch_df))
+
+        # Combine all processed batches of 'df' into a single DataFrame
+        df = pd.concat(processed_dfs, ignore_index=True)
+
+        # Process 'df_raw' in batches
+        processed_dfs_raw = []
+        for i in range(0, len(df_raw), batch_size):
+            batch_end = min(i+batch_size, len(df_raw)-i)
+            print("batch_end")
+            print(batch_end)
+            batch_df_raw = df.iloc[i:batch_end]
+            processed_dfs_raw.append(process_batch(batch_df_raw))
+
+        # Combine all processed batches of 'df_raw' into a single DataFrame
+        df_raw = pd.concat(processed_dfs_raw, ignore_index=True)
+
+        df.to_csv(xlsx_file_path, sep='\t', index=None)  
+        df_raw.to_csv(xlsx_file_path_raw, sep='\t', index=None)  
+
+        df['Embeddings'] = df['Embeddings'].apply(ast.literal_eval)
+        df.fillna("", inplace=True)
+
+        df_raw['Embeddings'] = df_raw['Embeddings'].apply(ast.literal_eval)
+        df_raw.fillna("", inplace=True)    
+
+        """    
         all_embeddings = []
         for index, row in df.iterrows():
             waveform = row['Waveform']
@@ -274,7 +325,19 @@ def process_files_to_embeddings_and_transcripts(path_to_audio_folder, handmade_t
         df_raw['Embeddings'] = df_raw['Embeddings'].apply(ast.literal_eval)
         #df_raw['Waveform'] = df_raw['Waveform'].apply(ast.literal_eval)
         df_raw.fillna("", inplace=True)
+        """
+        
+        
+        
+        
+        
     return df, df_raw
+
+
+
+
+
+
 
 
 # The compute_similarity_score function computes the cosine similarity score between two speaker embeddings.
@@ -642,6 +705,9 @@ def main():
         process_audio_file(file)    
     print("Voice anonymization process completed.")
 
+    
+    torch.cuda.empty_cache()
+    
     # ### Evaluating voice anonymization based on the achieved privacy and utility
 
     # The following code processes the audio files in the specified audio_folder_path
@@ -650,11 +716,15 @@ def main():
     df, df_raw = process_files_to_embeddings_and_transcripts(audio_folder_path, handmade_transcript_available=True)
     print("Speaker embeddings extraction for original audio completed.")
 
+    torch.cuda.empty_cache()
+    
     # Calling the process_files_to_embeddings function with the anonymized_audio_folder_path as input.
     # This function will process the audio files in the anonymized_audio_folder_path and extract speaker embeddings for each speaker.
     anonymized_df, anonymized_df_raw = process_files_to_embeddings_and_transcripts(anonymized_audio_folder_path)
     print("Speaker embeddings extraction for anonymized audio completed.")
 
+    torch.cuda.empty_cache()
+    
     # Print information about the evaluation phase
     print("\nEvaluating voice anonymization based on the achieved privacy and utility...")
 

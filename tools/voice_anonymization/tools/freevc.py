@@ -90,39 +90,41 @@ class VoiceAnonymizer:
         with torch.no_grad():
             for line in tqdm(zip(srcs, tgts, outs)):
                 src, tgt, out = line
-                # Process target audio file
-                wav_tgt, _ = librosa.load(tgt, sr=self.hps.data.sampling_rate)
-                wav_tgt, _ = librosa.effects.trim(wav_tgt, top_db=20)
 
-                if self.hps.model.use_spk:
-                    # Extract speaker embedding if using a speaker encoder
-                    g_tgt = self.smodel.embed_utterance(wav_tgt)
-                    g_tgt = torch.from_numpy(g_tgt).unsqueeze(0).to(self.device)
-                else:
-                    # Convert target waveform to Mel spectrogram
-                    wav_tgt = torch.from_numpy(wav_tgt).unsqueeze(0).to(self.device)
-                    mel_tgt = mel_spectrogram_torch(
-                        wav_tgt,
-                        self.hps.data.filter_length,
-                        self.hps.data.n_mel_channels,
-                        self.hps.data.sampling_rate,
-                        self.hps.data.hop_length,
-                        self.hps.data.win_length,
-                        self.hps.data.mel_fmin,
-                        self.hps.data.mel_fmax
-                    )
+                with torch.no_grad():
+                    # Process target audio file
+                    wav_tgt, _ = librosa.load(tgt, sr=self.hps.data.sampling_rate)
+                    wav_tgt, _ = librosa.effects.trim(wav_tgt, top_db=20)
 
-                # Process source audio file
-                wav_src, _ = librosa.load(src, sr=self.hps.data.sampling_rate)
-                wav_src = torch.from_numpy(wav_src).unsqueeze(0).to(self.device)
-                c = utils.get_content(self.cmodel, wav_src)  # Extract content embedding
+                    if self.hps.model.use_spk:
+                        # Extract speaker embedding if using a speaker encoder
+                        g_tgt = self.smodel.embed_utterance(wav_tgt)
+                        g_tgt = torch.from_numpy(g_tgt).unsqueeze(0).to(self.device)
+                    else:
+                        # Convert target waveform to Mel spectrogram
+                        wav_tgt = torch.from_numpy(wav_tgt).unsqueeze(0).to(self.device)
+                        mel_tgt = mel_spectrogram_torch(
+                            wav_tgt,
+                            self.hps.data.filter_length,
+                            self.hps.data.n_mel_channels,
+                            self.hps.data.sampling_rate,
+                            self.hps.data.hop_length,
+                            self.hps.data.win_length,
+                            self.hps.data.mel_fmin,
+                            self.hps.data.mel_fmax
+                        )
 
-                # Perform voice synthesis
-                if self.hps.model.use_spk:
-                    audio = self.net_g.infer(c, g=g_tgt)  # Use speaker encoder for synthesis
-                else:
-                    audio = self.net_g.infer(c, mel=mel_tgt)  # Use Mel spectrogram for synthesis
-                audio = audio[0][0].data.cpu().float().numpy()
+                    # Process source audio file
+                    wav_src, _ = librosa.load(src, sr=self.hps.data.sampling_rate)
+                    wav_src = torch.from_numpy(wav_src).unsqueeze(0).to(self.device)
+                    c = utils.get_content(self.cmodel, wav_src)  # Extract content embedding
+
+                    # Perform voice synthesis
+                    if self.hps.model.use_spk:
+                        audio = self.net_g.infer(c, g=g_tgt)  # Use speaker encoder for synthesis
+                    else:
+                        audio = self.net_g.infer(c, mel=mel_tgt)  # Use Mel spectrogram for synthesis
+                    audio = audio[0][0].data.cpu().float().numpy()
 
                 # Save the synthesized audio to the output file
                 Path(os.path.dirname(out)).mkdir(parents=True, exist_ok=True)

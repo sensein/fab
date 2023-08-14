@@ -50,5 +50,6 @@ class VoiceAnonymizer:
         for line in tqdm(zip(source_files, target_files, output_files)):
             source_file, target_file, output_file = line
 
-            # Perform voice conversion using the initialized TTS model and save the converted audio to the output file
-            self.tts.voice_conversion_to_file(source_wav=source_file, target_wav=target_file, file_path=output_file)
+            with torch.no_grad():
+                # Perform voice conversion using the initialized TTS model and save the converted audio to the output file
+                self.tts.voice_conversion_to_file(source_wav=source_file, target_wav=target_file, file_path=output_file)

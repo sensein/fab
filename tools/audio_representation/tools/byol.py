@@ -1,6 +1,6 @@
 import inspect
 import serab_byols
-
+import torch
 
 class AudioEncoder:
     def __init__(self, model_name='pyannote_audio', model_checkpoint=None, models_save_dir='', extra_params=None):
@@ -74,8 +74,9 @@ class AudioEncoder:
         if not self.time_independent_representation_available:
             raise NotImplementedError("Time independent audio representation extraction is not available.")
 
-        # Extract embeddings using the provided encoder and config path
-        embeddings = serab_byols.get_scene_embeddings(input_waveforms, self.encoder, self.cfg_path)
+        with torch.no_grad():
+            # Extract embeddings using the provided encoder and config path
+            embeddings = serab_byols.get_scene_embeddings(input_waveforms, self.encoder, self.cfg_path)
 
         # Return the extracted embeddings
         return embeddings, embeddings

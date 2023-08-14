@@ -1,6 +1,7 @@
 import os
 import inspect
 from speechbrain.pretrained import EncoderClassifier
+import torch
 
 
 class AudioEncoder:
@@ -73,7 +74,8 @@ class AudioEncoder:
         if not self.time_dependent_representation_available:
             raise NotImplementedError("Temporal audio representation extraction is not available.")
         # Encode the input waveforms to obtain embeddings
-        embeddings = self.encoder.encode_temp_batch(input_waveforms)  # TODO: FIX IT FOR CRYCELEB MODEL!
+        with torch.no_grad():
+            embeddings = self.encoder.encode_temp_batch(input_waveforms)  # TODO: FIX IT FOR CRYCELEB MODEL!
         return embeddings, embeddings
 
     def time_independent_audio_representation_extraction(self, input_waveforms):
@@ -90,7 +92,8 @@ class AudioEncoder:
         if not self.time_independent_representation_available:
             raise NotImplementedError("Time-independent audio representation extraction is not available.")
         # Encode the input waveforms to obtain embeddings
-        embeddings = self.encoder.encode_batch(input_waveforms).squeeze(1)
+        with torch.no_grad():
+            embeddings = self.encoder.encode_batch(input_waveforms).squeeze(1)
         return embeddings, embeddings
 
 # TODO: IMPLEMENT THE SLIDING-WINDOW VERSION OF TEMPORAL REPRESENTATION AS FOR PYANNOTE-AUDIO

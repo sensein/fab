@@ -1,6 +1,7 @@
 import os
 import inspect
 import s3prl.hub as s3hub
+import torch
 
 
 class AudioEncoder:
@@ -88,9 +89,10 @@ class AudioEncoder:
         if not self.time_dependent_representation_available:
             raise NotImplementedError("Temporal audio representation extraction is not available.")
 
-        raw_encoder_response = self.encoder(input_waveforms)
-        # Encode the input waveforms to obtain embeddings
+        with torch.no_grad():
+            raw_encoder_response = self.encoder(input_waveforms)
 
+        # Encode the input waveforms to obtain embeddings
         if self.layer_number > len(raw_encoder_response["hidden_states"]) - 1:
             raise NotImplementedError(
                 f"layer_number can only be a value between 0 and {len(raw_encoder_response['hidden_states']) - 1}")

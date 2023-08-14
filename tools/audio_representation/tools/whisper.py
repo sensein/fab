@@ -92,9 +92,10 @@ class AudioEncoder:
 
         for input_waveform in input_waveforms:
             # Encode the input waveforms to obtain embeddings
-            inputs = self.feature_extractor(input_waveform, sampling_rate=self.sampling_rate, return_tensors="pt")
-            input_features = inputs.input_features
-            embeddings = self.encoder(input_features, output_hidden_states=True)
+            with torch.no_grad():
+                inputs = self.feature_extractor(input_waveform, sampling_rate=self.sampling_rate, return_tensors="pt")
+                input_features = inputs.input_features
+                embeddings = self.encoder(input_features, output_hidden_states=True)
             raw_encoder_response.append(embeddings)
 
             if self.layer_number > len(embeddings.hidden_states) - 1:

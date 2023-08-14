@@ -1,6 +1,7 @@
 import os
 import inspect
 from transformers import AutoProcessor, AutoModelForAudioClassification, AutoFeatureExtractor
+import torch
 
 
 class AudioEncoder:
@@ -85,7 +86,8 @@ class AudioEncoder:
         if not hasattr(self, 'layer_number'):
             raise NotImplementedError("layer_number not specified.")
 
-        raw_encoder_response = self.encoder(input_waveforms, output_hidden_states=True)
+        with torch.no_grad():
+            raw_encoder_response = self.encoder(input_waveforms, output_hidden_states=True)
 
         if self.layer_number > len(raw_encoder_response['hidden_states']) - 1:
             raise NotImplementedError(
