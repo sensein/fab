@@ -51,10 +51,6 @@ class AudioRepresentation:
         elif model_name.startswith("pyannote_audio"):
             self.model = PyannoteAudioSpeakerEmbeddings(model_name=model_name, model_checkpoint=model_checkpoint,
                                                     models_save_dir=models_save_dir, extra_params=extra_params)
-<<<<<<< HEAD
-=======
-
->>>>>>> 8c2edc21dc9d0e462c449534e0d8c7d20684b5c4
         '''
 
         # Check the availability of different encoding options
