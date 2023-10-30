@@ -1,4 +1,5 @@
 # Import Transcriber classes from tools.whisper and tools.mms modules
+#from .tools.whisper import Transcriber as Whisper
 from .tools.whisper import Transcriber as Whisper
 from .tools.mms import Transcriber as MassivelyMultilingualSpeech
 

@@ -3,11 +3,12 @@ seaborn
 ipywidgets
 scikit-learn
 datasets
-openai-whisper
+#openai-whisper
 openpyxl
 pylangacq
 jiwer
-contractions
-mecab-python3
-unidic-lite
-
+#contractions
+#mecab-python3
+#unidic-lite
+pyloudnorm
+pandarallel

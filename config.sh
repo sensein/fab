@@ -1,4 +1,4 @@
 #################### config #########################
 env_name="fab"
-conda_sh="/Users/fabiocat/miniconda3/etc/profile.d/conda.sh"
+conda_sh="/om2/user/fabiocat/myconda/etc/profile.d/conda.sh"
 #################### config #########################

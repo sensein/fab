@@ -42,6 +42,8 @@ class AudioEncoder:
             # the last layer is the default one
             self.layer_number = -1
         self.model_name = model_name
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.encoder.to(self.device)
 
     def check_temporal_audio_extraction(self):
         """
@@ -87,13 +89,12 @@ class AudioEncoder:
             raise NotImplementedError("layer_number not specified.")
 
         with torch.no_grad():
-            raw_encoder_response = self.encoder(input_waveforms, output_hidden_states=True)
+            raw_encoder_response = self.encoder(input_waveforms.to(self.device), output_hidden_states=True)
 
         if self.layer_number > len(raw_encoder_response['hidden_states']) - 1:
             raise NotImplementedError(
                 f"layer_number can only be a value between 0 and {len(raw_encoder_response['hidden_states']) - 1}")
 
-        embeddings = raw_encoder_response['hidden_states'][self.layer_number].permute(0, 2, 1)
+        embeddings = raw_encoder_response['hidden_states'][self.layer_number].permute(0, 2, 1).cpu()
 
         return raw_encoder_response, embeddings
-

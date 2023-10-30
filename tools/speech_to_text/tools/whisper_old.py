@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-from transformers import WhisperProcessor, WhisperForConditionalGeneration
+import whisper
 import numpy as np
 import torch
 import pathlib
@@ -26,7 +26,7 @@ class Transcriber:
 
         # Set the default model checkpoint if not provided
         if not model_checkpoint:
-            self.model_checkpoint = 'openai/whisper-large-v2'
+            self.model_checkpoint = 'large-v2'
         else:
             self.model_checkpoint = model_checkpoint
 
@@ -46,26 +46,22 @@ class Transcriber:
         self.extra_params = extra_params
 
         # Set word_timestamps to True if provided, else set to False (default)
-        """
         if bool(extra_params) and 'word_timestamps' in extra_params:
             self.word_timestamps = extra_params['word_timestamps']
         else:
             self.word_timestamps = False
-        """
-
-        # Set the sampling rate for audio if provided, else set to the default (16000 Hz)
-        if bool(extra_params) and 'sampling_rate' in extra_params:
-            self.sampling_rate = extra_params['sampling_rate']
-        else:
-            self.sampling_rate = 16000
 
         # Determine the device (GPU or CPU) for computation
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-        self.processor = WhisperProcessor.from_pretrained(self.model_checkpoint, cache_dir=self.models_save_dir)
-        self.model = WhisperForConditionalGeneration.from_pretrained(self.model_checkpoint, cache_dir=self.models_save_dir)
-        self.model.to(self.device)
-        self.forced_decoder_ids = self.processor.get_decoder_prompt_ids(language=self.language, task="transcribe")
+        # Load the Whisper ASR model
+        self.model = whisper.load_model(self.model_checkpoint, device=self.device, download_root=self.models_save_dir)
+
+        # Print information about the model's language and parameter count
+        print(
+            f"Model is {'multilingual' if self.model.is_multilingual else 'English-only'} "
+            f"and has {sum(np.prod(p.shape) for p in self.model.parameters()):,} parameters."
+        )
 
     def transcribe(self, waveforms_or_files):
         """
@@ -82,12 +78,10 @@ class Transcriber:
         results = []
         transcripts = []
         for audio in waveforms_or_files:
+            # Transcribe the audio using the Whisper model
             with torch.no_grad():
-                input_features = self.processor(audio, sampling_rate=self.sampling_rate, return_tensors="pt", padding_strategy = 'max_length').input_features
-                input_features = input_features.to(self.device) 
-                predicted_ids = self.model.generate(input_features, forced_decoder_ids=self.forced_decoder_ids)
-                result = self.processor.batch_decode(predicted_ids, skip_special_tokens=True)
-                text = result[0]
-                results.append(text)
-                transcripts.append(text)
+                result = self.model.transcribe(audio, language=self.language, word_timestamps=self.word_timestamps)
+            text = result['text']
+            results.append(result)
+            transcripts.append(text)
         return results, transcripts

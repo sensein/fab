@@ -161,64 +161,64 @@ cd ..
 #################### TTS #########################
 
 #################### FreeVC #########################
-repo_url="https://github.com/fabiocat93/FreeVC.git"
-repo_dir="FreeVC"
+#repo_url="https://github.com/fabiocat93/FreeVC.git"
+#repo_dir="FreeVC"
 
-if [ -d "$repo_dir" ]; then
-  # Repository exists, pull updates
-  echo "Repository '$repo_dir' exists, pulling updates..."
-  cd "$repo_dir"
-  git pull
-  cd ..
-else
-  # Repository does not exist, clone it
-  echo "Repository '$repo_dir' does not exist, cloning..."
-  git clone "$repo_url" "$repo_dir"
-fi
+#if [ -d "$repo_dir" ]; then
+#  # Repository exists, pull updates
+#  echo "Repository '$repo_dir' exists, pulling updates..."
+#  cd "$repo_dir"
+#  git pull
+#  cd ..
+#else
+#  # Repository does not exist, clone it
+#  echo "Repository '$repo_dir' does not exist, cloning..."
+#  git clone "$repo_url" "$repo_dir"
+#fi
 
-cd "$repo_dir"
-pip install -r requirements.txt
+#cd "$repo_dir"
+#pip install -r requirements.txt
 
-url1="https://www.dropbox.com/scl/fi/tqz5z98nxn0voba223z6a/logs.zip?rlkey=uivc6sbd8lie0iw2bds1wfrwa&dl=1"  # URL of the directory to download
-url2="https://www.dropbox.com/scl/fi/sqsmafd8botn3fb1y2wy8/checkpoints.zip?rlkey=wq79puddc7x3vqibe3cenajgl&dl=1"  # URL of the directory to download
-url3="https://www.dropbox.com/scl/fi/abe95mw01hr87h2fx3i76/WavLM-Large.pt.zip?rlkey=0po2jd2u77q2zt6irrmmz2shc&dl=1"  # URL of the file to download
+#url1="https://www.dropbox.com/scl/fi/tqz5z98nxn0voba223z6a/logs.zip?rlkey=uivc6sbd8lie0iw2bds1wfrwa&dl=1"  # URL of the directory to download
+#url2="https://www.dropbox.com/scl/fi/sqsmafd8botn3fb1y2wy8/checkpoints.zip?rlkey=wq79puddc7x3vqibe3cenajgl&dl=1"  # URL of the directory to download
+#url3="https://www.dropbox.com/scl/fi/abe95mw01hr87h2fx3i76/WavLM-Large.pt.zip?rlkey=0po2jd2u77q2zt6irrmmz2shc&dl=1"  # URL of the file to download
 
-destination_folder1="logs"         # Destination folder path
-destination_folder2="checkpoints"         # Destination folder path
-destination_folder3="wavlm"           # Destination folder path
-
-# Check if the destination folder exists
-if [ ! -d "$destination_folder1" ]; then
-  wget -O $destination_folder1.zip "$url1"
-  unzip $destination_folder1.zip
-  rm $destination_folder1.zip
-else
-  echo "Folder $destination_folder1 already exists."
-fi
+#destination_folder1="logs"         # Destination folder path
+#destination_folder2="checkpoints"         # Destination folder path
+#destination_folder3="wavlm"           # Destination folder path
 
 # Check if the destination folder exists
-if [ ! -d "$destination_folder2" ]; then
-  wget -O $destination_folder2.zip "$url2"
-  unzip $destination_folder2.zip
-  rm $destination_folder2.zip
-else
-  echo "Folder $destination_folder2 already exists."
-fi
+#if [ ! -d "$destination_folder1" ]; then
+#  wget -O $destination_folder1.zip "$url1"
+#  unzip $destination_folder1.zip
+#  rm $destination_folder1.zip
+#else
+#  echo "Folder $destination_folder1 already exists."
+#fi
 
-file_name="WavLM-Large.pt"
-file_path="$destination_folder3/$file_name"     # Full path of the destination file
-if [ -f "$file_path" ]; then
-  echo "File $file_name already exists in $folder_path."
-else
-  echo "File $file_name does not exist. Downloading..."
-  wget -O $file_name.zip "$url3"
-  unzip $file_name.zip
-  rm $file_name.zip
-  mv $file_name $file_path
-fi
+# Check if the destination folder exists
+#if [ ! -d "$destination_folder2" ]; then
+#  wget -O $destination_folder2.zip "$url2"
+#  unzip $destination_folder2.zip
+#  rm $destination_folder2.zip
+#else
+#  echo "Folder $destination_folder2 already exists."
+#fi
+
+#file_name="WavLM-Large.pt"
+#file_path="$destination_folder3/$file_name"     # Full path of the destination file
+#if [ -f "$file_path" ]; then
+#  echo "File $file_name already exists in $folder_path."
+#else
+#  echo "File $file_name does not exist. Downloading..."
+#  wget -O $file_name.zip "$url3"
+#  unzip $file_name.zip
+#  rm $file_name.zip
+#  mv $file_name $file_path
+#fi
 
 # shellcheck disable=SC2103
-cd ..
+#cd ..
 #################### FreeVC #########################
 
 #################### fab #########################

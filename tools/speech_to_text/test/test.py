@@ -10,7 +10,7 @@ from tools.speech_to_text import Transcriber
 models_to_test = [
     {"model_name": "mms", "model_checkpoint": None, "language": None, "models_save_dir": None, "extra_params": None},
     {"model_name": "whisper", "model_checkpoint": None, "language": None, "models_save_dir": None, "extra_params": None},
-    {"model_name": "whisper", "model_checkpoint": None, "language": None, "models_save_dir": None, "extra_params": {"word_timestamps":True}},
+    #{"model_name": "whisper", "model_checkpoint": None, "language": None, "models_save_dir": None, "extra_params": {"word_timestamps":True}},
 ]
 
 print("models_to_test")
@@ -21,7 +21,7 @@ with warnings.catch_warnings():
     warnings.simplefilter("ignore")
 
     # Create a random input waveform
-    input_waveform = torch.rand(4, 1, 32000)
+    input_waveform = torch.rand(3, 1, 32000)
 
     if input_waveform.size(1) == 1:
         input_waveform = input_waveform.squeeze(1)
@@ -33,7 +33,7 @@ with warnings.catch_warnings():
 
     # Iterate over representations to test
     for model_to_test in models_to_test:
-        print(model_to_test)
+            print(model_to_test)
 
         try:
             # Create an instance of the AudioRepresentation class
