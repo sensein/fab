@@ -6,8 +6,11 @@ import torchaudio
 from tqdm import tqdm
 import torch
 
+#sys.path.append('../../')
+
+
 # Import modules from the audio_representation library
-from tools.audio_representation import AudioRepresentation
+from ....tools.audio_representation import AudioRepresentation
 
 # Import models from the transformers library
 from transformers import SpeechT5Processor, SpeechT5ForSpeechToSpeech, SpeechT5HifiGan

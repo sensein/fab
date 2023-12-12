@@ -12,3 +12,4 @@ jiwer
 #unidic-lite
 pyloudnorm
 pandarallel
+webrtcvad
