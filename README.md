@@ -40,9 +40,13 @@ This will set up fab on your system, ready for use.
 
 # To do:
 - [x] Setup dev branch for `fab`
-- [ ] Setup unit tests for `fab`
-- [ ] Setup docs (https://docs.readthedocs.io/en/stable/intro/getting-started-with-sphinx.html)
+- [ ] Setup unit tests for `fab` (https://docs.pytest.org/en/8.0.x/)
+- [ ] Setup docs (https://docs.readthedocs.io/en/stable/intro/getting-started-with-sphinx.html or https://pdoc.dev/)
 - [ ] Setup CLI (https://realpython.com/python-click/)
+- [ ] Choose a license (https://choosealicense.com/)
+- [ ] Choose a python package manager (poetry or pip - https://levelup.gitconnected.com/pip-vs-poetry-in-python-picking-the-preferable-package-manager-4ca1549724ae)
+- [ ] Setup static code checker (https://mypy.readthedocs.io/en/stable/getting_started.html)
+- [ ] Setup linter (https://github.com/astral-sh/ruff)
 - [ ] Listing some good functional tasks for `fab`
 - [ ] Preparing input and output json-schemas for `fab`'s tasks
 - [ ] Implementing functional tasks for `fab`
