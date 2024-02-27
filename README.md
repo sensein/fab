@@ -40,6 +40,7 @@ This will set up fab on your system, ready for use.
 
 # To do:
 - [x] Setup dev branch for `fab`
+- [ ] Switching python version? (https://devguide.python.org/versions/)
 - [ ] Setup unit tests for `fab` (https://docs.pytest.org/en/8.0.x/)
 - [ ] Setup docs (https://docs.readthedocs.io/en/stable/intro/getting-started-with-sphinx.html or https://pdoc.dev/)
 - [ ] Setup CLI (https://realpython.com/python-click/)
