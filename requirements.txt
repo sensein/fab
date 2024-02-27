@@ -1,0 +1,44 @@
+# Core Data Science and Analysis Libraries
+numpy
+pandas
+scipy
+scikit-learn
+statsmodels
+
+# Visualization Libraries
+matplotlib
+seaborn
+plotly
+
+# Notebook
+notebook
+ipywidgets
+
+# Software engineering
+jsonschema
+python-dotenv
+tqdm
+
+# Deep Learning and Machine Learning Frameworks
+torch
+torchvision
+transformers
+datasets
+scikit-learn
+
+# Audio and Speech Processing Libraries
+torchaudio
+praat-parselmouth
+speechbrain
+sox
+pyloudnorm
+TTS
+opensmile
+jiwer
+pylangacq
+pyannote.audio
+faster-whisper
+whisperx @ git+https://github.com/m-bain/whisperx.git
+chcochleagram @ git+https://github.com/jenellefeather/chcochleagram.git
+
+# Note: Git is not a Python package and thus not included in requirements.txt. Ensure git is installed separately.

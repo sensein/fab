@@ -1,0 +1,48 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Transcription Result",
+  "type": "object",
+  "properties": {
+    "formatted": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "chunks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "timestamps": {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "items": {
+                    "type": "number"
+                  }
+                }
+              },
+              "required": ["text", "timestamps"]
+            }
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "description": "An array of transcription results, possibly split into chunks with timestamps."
+    },
+    "raw": {
+      "type": "array",
+      "items": {},
+      "description": "Raw transcription results without detailed structure."
+    }
+  },
+  "required": ["formatted", "raw"], 
+  "additionalProperties": false
+}
