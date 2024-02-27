@@ -41,6 +41,8 @@ This will set up fab on your system, ready for use.
 # To do:
 - [x] Setup dev branch for `fab`
 - [ ] Setup unit tests for `fab`
+- [ ] Setup docs (https://docs.readthedocs.io/en/stable/intro/getting-started-with-sphinx.html)
+- [ ] Setup CLI (https://realpython.com/python-click/)
 - [ ] Listing some good functional tasks for `fab`
 - [ ] Preparing input and output json-schemas for `fab`'s tasks
 - [ ] Implementing functional tasks for `fab`
