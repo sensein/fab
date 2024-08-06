@@ -1,3 +1,6 @@
+# Inspired by the feature extraction script in "Deciphering Enigma" by Gasser Elbanna (@GasserElbanna)
+# (https://github.com/sensein/speaker_identity_perception/blob/main/chapter1/deciphering_enigma/feature_extractor.py).
+# Thank you, mate, for making the code open and available.
 import torch
 from .tools.ecapa_tdnn import AudioEncoder as EcapaTDNN
 from .tools.wavLM_HuBERT_wav2vec2_data2vec import AudioEncoder as WavLMHuBERTWav2vec2Data2vec
